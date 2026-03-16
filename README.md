@@ -3,7 +3,7 @@
 A clean, fast, searchable personal knowledge base built as a static site.
 Hosted free on GitHub Pages. No backend, no database.
 
-## 🚀 Setup on GitHub Pages (5 minutes)
+## 🚀 Setup on GitHub Pages (5 minutes)    
 
 ### Step 1 — Create Your Repository
 1. Go to [github.com](https://github.com) → **New repository**
