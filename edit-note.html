@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Note — NoteBase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .form-section { max-width: 780px; }
+    .form-group { margin-bottom: 24px; }
+    .form-label {
+      display: block; font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: var(--bg-2); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 16px; border-radius: 10px;
+      font-family: 'Figtree', sans-serif; font-size: 15px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .form-select option { background: var(--bg-2); }
+    .form-textarea {
+      font-family: 'DM Mono', monospace; font-size: 13px;
+      line-height: 1.7; resize: vertical; min-height: 380px;
+    }
+    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .form-actions {
+      display: flex; gap: 12px; align-items: center; margin-top: 32px;
+      padding-top: 24px; border-top: 1px solid var(--border);
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff; border: none; padding: 12px 28px;
+      border-radius: 10px; font-family: 'Figtree', sans-serif; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+      box-shadow: 0 4px 16px rgba(79,142,247,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(79,142,247,0.45); }
+    .btn-secondary {
+      background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+      padding: 12px 20px; border-radius: 10px; font-family: 'Figtree', sans-serif;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .output-box {
+      display: none; margin-top: 24px; border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .output-header {
+      background: var(--bg-3); padding: 14px 20px; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .output-title { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+    .btn-copy {
+      background: var(--accent); color: #fff; border: none; padding: 6px 14px;
+      border-radius: 6px; font-size: 12px; font-family: 'DM Mono', monospace; cursor: pointer;
+    }
+    .btn-copy:hover { opacity: 0.85; }
+    .output-content {
+      padding: 20px; font-family: 'DM Mono', monospace; font-size: 12.5px;
+      color: var(--text); line-height: 1.7; white-space: pre-wrap; word-break: break-all;
+      background: var(--bg-2); max-height: 320px; overflow-y: auto;
+    }
+    .steps-box {
+      display: none; margin-top: 20px; background: var(--accent-glow);
+      border: 1px solid rgba(79,142,247,0.2); border-radius: 12px; padding: 20px 24px;
+    }
+    .steps-box h3 { font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--accent); }
+    .steps-box ol { padding-left: 20px; font-size: 13.5px; color: var(--text); line-height: 2; }
+    .steps-box code { background: var(--bg-3); padding: 1px 7px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent-2); }
+    .copied { background: #22c55e !important; }
+    .edit-notice {
+      background: color-mix(in srgb, var(--cat-powerbi) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--cat-powerbi) 30%, transparent);
+      border-radius: 12px; padding: 14px 18px; margin-bottom: 28px;
+      font-size: 13px; color: var(--text-muted); line-height: 1.6;
+    }
+    .edit-notice strong { color: var(--cat-powerbi); }
+    @media (max-width: 700px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">NoteBase</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
+      <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
+      <a href="index.html?cat=powerautomate" class="nav-item"><span class="nav-icon">↻</span> Power Automate</a>
+      <a href="index.html?cat=powerbi" class="nav-item"><span class="nav-icon">◈</span> Power BI</a>
+      <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
+      <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <a href="#" id="backLink" class="viewer-back">← Back to note</a>
+
+    <div class="page-header" style="margin-bottom: 28px;">
+      <p class="header-label">EDIT NOTE</p>
+      <h1 class="header-title" id="pageTitle">Edit</h1>
+    </div>
+
+    <div class="form-section">
+      <div class="edit-notice">
+        ⚠️ <strong>How editing works:</strong> Make your changes below, then click <strong>Generate Updated Files</strong>. Copy the outputs and update the files on GitHub + redeploy on Netlify. The content field is pre-filled with a placeholder — paste your actual note content in.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note Title *</label>
+        <input type="text" class="form-input" id="noteTitle" />
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-select" id="noteCategory" onchange="updateSubcategories()">
+            <option value="powerapps"     data-label="Power Apps">Power Apps</option>
+            <option value="powerautomate" data-label="Power Automate">Power Automate</option>
+            <option value="powerbi"       data-label="Power BI">Power BI</option>
+            <option value="sharepoint"    data-label="SharePoint">SharePoint</option>
+            <option value="other"         data-label="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subcategory</label>
+          <select class="form-select" id="noteSubcategory"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="noteDate" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Short Description *</label>
+        <input type="text" class="form-input" id="noteExcerpt" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" class="form-input" id="noteTags" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note Content (Markdown)</label>
+        <textarea class="form-textarea" id="noteContent"></textarea>
+        <p class="form-hint">Paste your updated note content here. Fetch the current content by opening the raw .md file on GitHub.</p>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" onclick="generateUpdated()">Generate Updated Files ↓</button>
+        <a id="cancelLink" href="#" class="btn-secondary">Cancel</a>
+      </div>
+
+      <!-- Updated Markdown -->
+      <div class="output-box" id="outputBox">
+        <div class="output-header">
+          <span class="output-title" id="outputLabel">Updated .md file content</span>
+          <button class="btn-copy" onclick="copyContent(event)">Copy</button>
+        </div>
+        <div class="output-content" id="outputContent"></div>
+      </div>
+
+      <!-- Updated notes-data.js entry -->
+      <div class="output-box" id="outputBox2">
+        <div class="output-header">
+          <span class="output-title">Updated notes-data.js entry — replace the old one</span>
+          <button class="btn-copy" onclick="copyEntry(event)">Copy</button>
+        </div>
+        <div class="output-content" id="outputEntry"></div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-box" id="stepsBox">
+        <h3>📋 Next Steps — Publish your edits</h3>
+        <ol>
+          <li>Copy the <strong>Updated Markdown</strong> above → open <code id="stepFile"></code> on GitHub → replace its contents → commit</li>
+          <li>Copy the <strong>Updated notes-data.js entry</strong> → open <code>notes-data.js</code> on GitHub → find the old entry for this note → replace it → commit</li>
+          <li>Redeploy on Netlify — your changes will be live within 30 seconds ✅</li>
+        </ol>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="notes-data.js"></script>
+  <script>
+    // Theme
+    const saved = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '☾';
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
+    });
+
+    // Load note data into form
+    const params = new URLSearchParams(window.location.search);
+    const noteId = params.get('note');
+    const note   = NOTES.find(n => n.id === noteId);
+
+    if (!note) {
+      document.getElementById('pageTitle').textContent = 'Note not found';
+    } else {
+      document.title = `Edit: ${note.title} — NoteBase`;
+      document.getElementById('pageTitle').textContent = note.title;
+      document.getElementById('noteTitle').value   = note.title;
+      document.getElementById('noteExcerpt').value = note.excerpt;
+      document.getElementById('noteTags').value    = note.tags.join(', ');
+      document.getElementById('noteDate').value    = note.date;
+      document.getElementById('noteContent').value = `# ${note.title}\n\n<!-- Paste your updated note content here -->\n<!-- Tip: get current content from GitHub at ${note.file} -->`;
+
+      // Set category
+      const catSel = document.getElementById('noteCategory');
+      for (let opt of catSel.options) { if (opt.value === note.category) { opt.selected = true; break; } }
+
+      // Set subcategory
+      updateSubcategories();
+      const subSel = document.getElementById('noteSubcategory');
+      for (let opt of subSel.options) { if (opt.value === note.subcategory) { opt.selected = true; break; } }
+
+      // Back link
+      document.getElementById('backLink').href  = `viewer.html?note=${note.id}`;
+      document.getElementById('cancelLink').href = `viewer.html?note=${note.id}`;
+    }
+
+    function updateSubcategories() {
+      const cat = document.getElementById('noteCategory').value;
+      const subSelect = document.getElementById('noteSubcategory');
+      const options = SUBCATEGORIES[cat] || ['Other'];
+      subSelect.innerHTML = options.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function slugify(text) {
+      return text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+    }
+
+    function generateUpdated() {
+      const title    = document.getElementById('noteTitle').value.trim();
+      const category = document.getElementById('noteCategory').value;
+      const catLabel = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
+      const subcat   = document.getElementById('noteSubcategory').value;
+      const excerpt  = document.getElementById('noteExcerpt').value.trim();
+      const tagsRaw  = document.getElementById('noteTags').value.trim();
+      const date     = document.getElementById('noteDate').value;
+      const content  = document.getElementById('noteContent').value.trim();
+
+      if (!title || !excerpt) { alert('Please fill in Title and Description.'); return; }
+
+      // Keep original ID and file path if category hasn't changed, otherwise generate new
+      const id       = (note && note.category === category) ? note.id : slugify(title);
+      const filePath = (note && note.category === category) ? note.file : `notes/${category}/${slugify(title)}.md`;
+      const tags     = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`).join(', ') : '"general"';
+
+      document.getElementById('outputBox').style.display = 'block';
+      document.getElementById('outputLabel').textContent = filePath;
+      document.getElementById('outputContent').textContent = content || '<!-- Add your note content here -->';
+
+      const entry = `  {\n    id: "${id}",\n    title: "${title}",\n    category: "${category}",\n    categoryLabel: "${catLabel}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt}",\n    tags: [${tags}],\n    file: "${filePath}",\n    date: "${date}"\n  },`;
+
+      document.getElementById('outputBox2').style.display = 'block';
+      document.getElementById('outputEntry').textContent = entry;
+      document.getElementById('stepsBox').style.display = 'block';
+      document.getElementById('stepFile').textContent = filePath;
+
+      document.getElementById('outputBox').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyContent(e) {
+      navigator.clipboard.writeText(document.getElementById('outputContent').textContent);
+      e.target.textContent = 'Copied!'; e.target.classList.add('copied');
+      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 2000);
+    }
+    function copyEntry(e) {
+      navigator.clipboard.writeText(document.getElementById('outputEntry').textContent);
+      e.target.textContent = 'Copied!'; e.target.classList.add('copied');
+      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 2000);
+    }
+  </script>
+</body>
+</html>

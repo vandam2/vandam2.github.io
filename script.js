@@ -28,13 +28,32 @@ themeToggle.addEventListener('click', () => {
   themeIcon.textContent = next === 'dark' ? '☀' : '☾';
 });
 
-// ─── RENDER CARDS ───────────────────────────
+// ─── HELPERS ────────────────────────────────
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 }
+
+function buildCard(note) {
+  const card = document.createElement('a');
+  card.className = `note-card cat-${note.category}`;
+  card.href = `viewer.html?note=${note.id}`;
+  const tagsHTML = note.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  card.innerHTML = `
+    <div class="card-top">
+      <span class="card-category">${note.categoryLabel}</span>
+      <span class="card-date">${formatDate(note.date)}</span>
+    </div>
+    <div class="card-title">${note.title}</div>
+    <div class="card-excerpt">${note.excerpt}</div>
+    <div class="card-tags">${tagsHTML}</div>
+  `;
+  return card;
+}
+
+// ─── RENDER CARDS ───────────────────────────
 
 function renderCards(notes) {
   cardGrid.innerHTML = '';
@@ -48,27 +67,43 @@ function renderCards(notes) {
   emptyState.style.display = 'none';
   resultCount.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
 
-  notes.forEach(note => {
-    const card = document.createElement('a');
-    card.className = `note-card cat-${note.category}`;
-    card.href = `viewer.html?note=${note.id}`;
+  // If filtering by a specific category AND not searching, group by subcategory
+  const groupBySubcat = currentFilter !== 'all' && !currentSearch.trim();
 
-    const tagsHTML = note.tags
-      .map(t => `<span class="tag">${t}</span>`)
-      .join('');
+  if (groupBySubcat) {
+    // Group notes by subcategory
+    const groups = {};
+    notes.forEach(note => {
+      const sub = note.subcategory || 'General';
+      if (!groups[sub]) groups[sub] = [];
+      groups[sub].push(note);
+    });
 
-    card.innerHTML = `
-      <div class="card-top">
-        <span class="card-category">${note.categoryLabel}</span>
-        <span class="card-date">${formatDate(note.date)}</span>
-      </div>
-      <div class="card-title">${note.title}</div>
-      <div class="card-excerpt">${note.excerpt}</div>
-      <div class="card-tags">${tagsHTML}</div>
-    `;
+    // Sort subcategory names alphabetically
+    const sortedKeys = Object.keys(groups).sort();
 
-    cardGrid.appendChild(card);
-  });
+    sortedKeys.forEach(subcat => {
+      // Subcategory heading
+      const heading = document.createElement('div');
+      heading.className = 'subcat-heading';
+      heading.innerHTML = `<span class="subcat-label">${subcat}</span><span class="subcat-count">${groups[subcat].length}</span>`;
+      cardGrid.appendChild(heading);
+
+      // Cards for this subcategory
+      const row = document.createElement('div');
+      row.className = 'subcat-grid';
+      groups[subcat].forEach(note => row.appendChild(buildCard(note)));
+      cardGrid.appendChild(row);
+    });
+
+  } else {
+    // Flat grid (all notes or search results)
+    const flatGrid = document.createElement('div');
+    flatGrid.className = 'subcat-grid';
+    notes.sort((a, b) => new Date(b.date) - new Date(a.date));
+    notes.forEach(note => flatGrid.appendChild(buildCard(note)));
+    cardGrid.appendChild(flatGrid);
+  }
 }
 
 // ─── FILTER + SEARCH ────────────────────────
@@ -86,12 +121,15 @@ function applyFilters() {
       n.title.toLowerCase().includes(q) ||
       n.excerpt.toLowerCase().includes(q) ||
       n.tags.some(t => t.toLowerCase().includes(q)) ||
-      n.categoryLabel.toLowerCase().includes(q)
+      n.categoryLabel.toLowerCase().includes(q) ||
+      (n.subcategory && n.subcategory.toLowerCase().includes(q))
     );
   }
 
-  // Sort by date descending
-  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (!currentSearch.trim()) {
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
   renderCards(filtered);
 }
 
@@ -115,7 +153,6 @@ navItems.forEach(item => {
     currentFilter = item.dataset.filter;
     navItems.forEach(i => i.classList.remove('active'));
     item.classList.add('active');
-    // Sync tab
     tabs.forEach(t => {
       t.classList.toggle('active', t.dataset.filter === currentFilter);
     });
@@ -136,7 +173,6 @@ searchInput.addEventListener('input', () => {
   applyFilters();
 });
 
-// Keyboard shortcut ⌘K / Ctrl+K to focus search
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault();

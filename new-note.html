@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New Note — NoteBase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .form-section { max-width: 780px; }
+    .form-group { margin-bottom: 24px; }
+    .form-label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .form-select option { background: var(--bg-2); }
+    .form-textarea {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      resize: vertical;
+      min-height: 380px;
+    }
+    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 16px rgba(79,142,247,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(79,142,247,0.45); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .output-box {
+      display: none;
+      margin-top: 24px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .output-header {
+      background: var(--bg-3);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .output-title { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+    .btn-copy {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-copy:hover { opacity: 0.85; }
+    .output-content {
+      padding: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: var(--bg-2);
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .steps-box {
+      display: none;
+      margin-top: 20px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(79,142,247,0.2);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .steps-box h3 { font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--accent); }
+    .steps-box ol { padding-left: 20px; font-size: 13.5px; color: var(--text); line-height: 2; }
+    .steps-box code { background: var(--bg-3); padding: 1px 7px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent-2); }
+    .copied { background: #22c55e !important; }
+    @media (max-width: 700px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">NoteBase</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
+      <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
+      <a href="index.html?cat=powerautomate" class="nav-item"><span class="nav-icon">↻</span> Power Automate</a>
+      <a href="index.html?cat=powerbi" class="nav-item"><span class="nav-icon">◈</span> Power BI</a>
+      <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
+      <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <a href="index.html" class="viewer-back">← Back to all notes</a>
+
+    <div class="page-header" style="margin-bottom: 32px;">
+      <p class="header-label">CREATE A NOTE</p>
+      <h1 class="header-title">New Note</h1>
+    </div>
+
+    <div class="form-section">
+
+      <div class="form-group">
+        <label class="form-label">Note Title *</label>
+        <input type="text" class="form-input" id="noteTitle" placeholder="e.g. Gallery Delegation Tips" />
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-select" id="noteCategory" onchange="updateSubcategories()">
+            <option value="powerapps"     data-label="Power Apps">Power Apps</option>
+            <option value="powerautomate" data-label="Power Automate">Power Automate</option>
+            <option value="powerbi"       data-label="Power BI">Power BI</option>
+            <option value="sharepoint"    data-label="SharePoint">SharePoint</option>
+            <option value="other"         data-label="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subcategory *</label>
+          <select class="form-select" id="noteSubcategory"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="noteDate" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Short Description (shown on card) *</label>
+        <input type="text" class="form-input" id="noteExcerpt" placeholder="One or two sentence summary of this note..." />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" class="form-input" id="noteTags" placeholder="e.g. gallery, delegation, performance" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note Content (Markdown) *</label>
+        <textarea class="form-textarea" id="noteContent" placeholder="# Your Note Title
+
+## Section One
+Write your note content here using Markdown...
+
+## Code Example
+\`\`\`
+Patch(MyList, {Title: &quot;Hello&quot;})
+\`\`\`
+
+## Tips
+- Tip one
+- Tip two
+"></textarea>
+        <p class="form-hint">Supports full Markdown — headings, bold, code blocks, lists, tables.</p>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" onclick="generateNote()">Generate Files ↓</button>
+        <a href="index.html" class="btn-secondary">Cancel</a>
+      </div>
+
+      <!-- Markdown Output -->
+      <div class="output-box" id="outputBox">
+        <div class="output-header">
+          <span class="output-title" id="outputLabel">notes/powerapps/your-note.md</span>
+          <button class="btn-copy" onclick="copyContent(event)">Copy</button>
+        </div>
+        <div class="output-content" id="outputContent"></div>
+      </div>
+
+      <!-- notes-data.js entry -->
+      <div class="output-box" id="outputBox2">
+        <div class="output-header">
+          <span class="output-title">notes-data.js — paste this inside the NOTES array</span>
+          <button class="btn-copy" onclick="copyEntry(event)">Copy</button>
+        </div>
+        <div class="output-content" id="outputEntry"></div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-box" id="stepsBox">
+        <h3>📋 Next Steps — Publish this note</h3>
+        <ol>
+          <li>Copy the <strong>Markdown content</strong> → save as <code id="stepFilename"></code> on your computer</li>
+          <li>Copy the <strong>notes-data.js entry</strong> → open <code>notes-data.js</code> on GitHub and paste it inside the <code>NOTES</code> array</li>
+          <li>Drag the new <code>.md</code> file into the Netlify deploy box (or redeploy the whole folder)</li>
+          <li>Your new note card will appear on the homepage within 30 seconds ✅</li>
+        </ol>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="notes-data.js"></script>
+  <script>
+    // Theme
+    const saved = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '☾';
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
+    });
+
+    // Set today's date
+    document.getElementById('noteDate').value = new Date().toISOString().split('T')[0];
+
+    // Populate subcategories based on selected category
+    function updateSubcategories() {
+      const cat = document.getElementById('noteCategory').value;
+      const subSelect = document.getElementById('noteSubcategory');
+      const options = SUBCATEGORIES[cat] || ['Other'];
+      subSelect.innerHTML = options.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+    updateSubcategories(); // init on load
+
+    function slugify(text) {
+      return text.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-').trim();
+    }
+
+    function generateNote() {
+      const title    = document.getElementById('noteTitle').value.trim();
+      const category = document.getElementById('noteCategory').value;
+      const catLabel = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
+      const subcat   = document.getElementById('noteSubcategory').value;
+      const excerpt  = document.getElementById('noteExcerpt').value.trim();
+      const tagsRaw  = document.getElementById('noteTags').value.trim();
+      const date     = document.getElementById('noteDate').value;
+      const content  = document.getElementById('noteContent').value.trim();
+
+      if (!title || !excerpt || !content) {
+        alert('Please fill in Title, Description, and Content.');
+        return;
+      }
+
+      const slug = slugify(title);
+      const tags = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`).join(', ') : '"general"';
+      const filePath = `notes/${category}/${slug}.md`;
+
+      document.getElementById('outputBox').style.display = 'block';
+      document.getElementById('outputLabel').textContent = filePath;
+      document.getElementById('outputContent').textContent = content;
+
+      const entry = `  {
+    id: "${slug}",
+    title: "${title}",
+    category: "${category}",
+    categoryLabel: "${catLabel}",
+    subcategory: "${subcat}",
+    excerpt: "${excerpt}",
+    tags: [${tags}],
+    file: "${filePath}",
+    date: "${date}"
+  },`;
+
+      document.getElementById('outputBox2').style.display = 'block';
+      document.getElementById('outputEntry').textContent = entry;
+      document.getElementById('stepsBox').style.display = 'block';
+      document.getElementById('stepFilename').textContent = filePath;
+
+      document.getElementById('outputBox').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyContent(e) {
+      navigator.clipboard.writeText(document.getElementById('outputContent').textContent);
+      e.target.textContent = 'Copied!'; e.target.classList.add('copied');
+      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 2000);
+    }
+
+    function copyEntry(e) {
+      navigator.clipboard.writeText(document.getElementById('outputEntry').textContent);
+      e.target.textContent = 'Copied!'; e.target.classList.add('copied');
+      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 2000);
+    }
+  </script>
+</body>
+</html>

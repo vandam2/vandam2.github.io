@@ -3,6 +3,9 @@
    Dark-first, editorial developer aesthetic
    ============================================ */
 
+/* Calibri is a system font on Windows/Office — used for all headings.
+   Falls back to Trebuchet MS, then a clean sans-serif on Mac/Linux. */
+
 :root {
   --bg:           #0c0f14;
   --bg-2:         #12171f;
@@ -79,7 +82,7 @@ body {
 }
 
 .logo-text {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif;
   font-weight: 800;
   font-size: 17px;
   letter-spacing: -0.3px;
@@ -185,7 +188,7 @@ body {
 }
 
 .header-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif;
   font-size: 36px;
   font-weight: 800;
   letter-spacing: -1px;
@@ -306,9 +309,7 @@ body {
 }
 
 .card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 18px;
+  display: block;
 }
 
 /* ─── NOTE CARD ───────────────────────────── */
@@ -375,7 +376,7 @@ body {
 }
 
 .card-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif;
   font-size: 17px;
   font-weight: 700;
   color: var(--text);
@@ -465,7 +466,7 @@ body {
 }
 
 .viewer-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif;
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -1px;
@@ -492,7 +493,7 @@ body {
 .note-content h1,
 .note-content h2,
 .note-content h3 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif;
   font-weight: 700;
   color: var(--text);
   margin: 2em 0 0.6em;
@@ -568,6 +569,48 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .note-content tr:hover td { background: var(--bg-3); }
+
+/* ─── SUBCATEGORY HEADINGS ───────────────── */
+
+.subcat-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 12px;
+  margin-top: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+  grid-column: 1 / -1;
+}
+
+.card-grid .subcat-heading:first-child {
+  margin-top: 0;
+}
+
+.subcat-label {
+  font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.subcat-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-3);
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+}
+
+.subcat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
 
 /* ─── ENTRY ANIMATIONS ────────────────────── */
 
