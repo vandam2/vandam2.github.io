@@ -28,11 +28,6 @@ ControlName As ControlType:
             Property: =Value
 ```
 
-**Key things to know:**
-- Properties prefixed with `=` are Power Fx formulas
-- Properties without `=` are static values
-- Indentation defines the control hierarchy
-- `Children:` contains nested controls
 
 ---
 
