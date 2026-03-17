@@ -38,17 +38,6 @@ const NOTES = [
     date: "2024-11-30"
   },
   {
-    id: "pa-yaml-basics",
-    title: "YAML in Power Apps — Reading & Writing",
-    category: "powerapps",
-    categoryLabel: "Power Apps",
-    subcategory: "YAML",
-    excerpt: "How to copy/paste YAML in Power Apps Studio, what the YAML structure maps to in the canvas, and tips for sharing components via YAML.",
-    tags: ["yaml", "components", "studio"],
-    file: "notes/powerapps/yaml-basics.md",
-    date: "2025-01-12"
-  },
-  {
     id: "flow-http-action",
     title: "HTTP Action & SharePoint REST API Calls",
     category: "powerautomate",
