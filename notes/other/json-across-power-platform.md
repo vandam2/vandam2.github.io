@@ -1,20 +1,3 @@
-# JSON in Power Platform — Parse, Schema, Escape
-
-## Why JSON Matters in Power Platform
-
-JSON is the data format used everywhere across Power Platform — HTTP responses, adaptive cards, flow outputs, Dataverse payloads. Understanding how to work with it saves enormous debugging time.
-
----
-
-## Power Automate — Parse JSON Action
-
-The **Parse JSON** action turns a raw JSON string into usable dynamic content.
-
-### Steps:
-1. Add **Data Operations → Parse JSON**
-2. Set **Content** to the JSON string (e.g., from an HTTP response body)
-3. Click **Generate from sample** → paste a real JSON example → Done
-
 ```json
 // Sample JSON to paste for schema generation
 {
