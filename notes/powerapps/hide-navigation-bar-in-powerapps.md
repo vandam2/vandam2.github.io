@@ -1,0 +1,1 @@
+##&hidenavbar=true
