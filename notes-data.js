@@ -93,17 +93,6 @@ const NOTES = [
     date: "2024-12-18"
   },
   {
-    id: "other-json-tricks",
-    title: "JSON in Power Platform — Parse, Schema, Escape",
-    category: "other",
-    categoryLabel: "Other",
-    subcategory: "Data Formats",
-    excerpt: "Working with JSON across Power Apps (ParseJSON), Power Automate (Parse JSON action), and the quirks — null handling, schema mismatches, dynamic content.",
-    tags: ["json", "cross-platform", "data"],
-    file: "notes/other/json-across-power-platform.md",
-    date: "2025-01-10"
-  },
-  {
     id: "other-odata-filters",
     title: "OData Filter Query Cheat Sheet",
     category: "other",
