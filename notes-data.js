@@ -5,6 +5,17 @@
 
 const NOTES = [
   {
+    id: "new-test",
+    title: "New test",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "Components",
+    excerpt: "New test",
+    tags: ["New test"],
+    file: "notes/powerapps/new-test.md",
+    date: "2026-03-17"
+  },
+  {
     id: "hide-navigation-bar-in-powerapps",
     title: "Hide Navigation bar in Powerapps",
     category: "powerapps",
