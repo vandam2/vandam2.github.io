@@ -71,17 +71,6 @@ const NOTES = [
     date: "2024-12-20"
   },
   {
-    id: "pbi-dax-calculate",
-    title: "DAX CALCULATE — Context Modification Deep Dive",
-    category: "powerbi",
-    categoryLabel: "Power BI",
-    subcategory: "DAX",
-    excerpt: "How CALCULATE modifies filter context, the order of evaluation, using REMOVEFILTERS vs ALL, and building year-over-year comparison measures.",
-    tags: ["dax", "calculate", "measures"],
-    file: "notes/powerbi/dax-calculate.md",
-    date: "2025-01-08"
-  },
-  {
     id: "pbi-row-level-security",
     title: "Row-Level Security Setup & Testing",
     category: "powerbi",
