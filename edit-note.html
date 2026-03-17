@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Note — NoteBase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .form-section { max-width:780px; }
+    .form-group { margin-bottom:24px; }
+    .form-label { display:block; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+    .form-input,.form-select,.form-textarea { width:100%; background:var(--bg-2); border:1px solid var(--border); color:var(--text); padding:12px 16px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:15px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+    .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+    .form-select option { background:var(--bg-2); }
+    .form-textarea { font-family:'DM Mono',monospace; font-size:13px; line-height:1.7; resize:vertical; min-height:380px; }
+    .form-hint { font-size:12px; color:var(--text-muted); margin-top:6px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    .token-box { background:var(--bg-2); border:1px solid var(--border); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .token-box-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .token-box-title { font-family:'Calibri','Trebuchet MS','Segoe UI',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+    .token-status { font-family:'DM Mono',monospace; font-size:11px; padding:3px 10px; border-radius:100px; }
+    .token-status.set { background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); }
+    .token-status.unset { background:rgba(239,68,68,0.12); color:#ef4444; border:1px solid rgba(239,68,68,0.25); }
+    .token-input-row { display:flex; gap:10px; }
+    .token-hint { font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.6; }
+    .token-hint a { color:var(--accent); }
+    .btn-save { background:var(--accent); color:#fff; border:none; padding:13px 32px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.15s; box-shadow:0 4px 16px rgba(79,142,247,0.3); display:inline-flex; align-items:center; gap:8px; }
+    .btn-save:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 22px rgba(79,142,247,0.45); }
+    .btn-save:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .btn-danger { background:transparent; color:#ef4444; border:1px solid rgba(239,68,68,0.4); padding:13px 20px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.15s; }
+    .btn-danger:hover { background:rgba(239,68,68,0.1); }
+    .btn-secondary { background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:13px 20px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:14px; cursor:pointer; transition:all 0.15s; text-decoration:none; display:inline-block; }
+    .btn-secondary:hover { color:var(--text); }
+    .btn-sm { padding:8px 16px; font-size:13px; border-radius:8px; }
+    .form-actions { display:flex; gap:12px; align-items:center; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); flex-wrap:wrap; }
+    .status-msg { display:none; padding:14px 18px; border-radius:10px; font-size:14px; margin-top:20px; line-height:1.5; }
+    .status-msg.saving { display:flex; align-items:center; gap:10px; background:var(--accent-glow); border:1px solid rgba(79,142,247,0.2); color:var(--accent); }
+    .status-msg.success { display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); color:#22c55e; }
+    .status-msg.error { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#ef4444; }
+    .spinner { width:16px; height:16px; border:2px solid rgba(79,142,247,0.3); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; align-items:center; justify-content:center; flex-direction:column; gap:16px; color:var(--text); font-size:14px; }
+    .loading-overlay.show { display:flex; }
+    @media (max-width:700px) { .form-row,.form-row-3 { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span class="logo-icon">⬡</span><span class="logo-text">NoteBase</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
+      <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
+      <a href="index.html?cat=powerautomate" class="nav-item"><span class="nav-icon">↻</span> Power Automate</a>
+      <a href="index.html?cat=powerbi" class="nav-item"><span class="nav-icon">◈</span> Power BI</a>
+      <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
+      <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button>
+    </div>
+  </aside>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner" style="width:32px;height:32px;border-width:3px;"></div>
+    <span id="loadingMsg">Loading note content from GitHub...</span>
+  </div>
+
+  <main class="main">
+    <a href="#" id="backLink" class="viewer-back">← Back to note</a>
+    <div class="page-header" style="margin-bottom:28px;">
+      <p class="header-label">EDIT NOTE</p>
+      <h1 class="header-title" id="pageTitle">Edit</h1>
+    </div>
+
+    <div class="form-section">
+      <!-- GitHub Token -->
+      <div class="token-box">
+        <div class="token-box-header">
+          <span class="token-box-title">🔑 GitHub Connection</span>
+          <span class="token-status unset" id="tokenStatus">Not set</span>
+        </div>
+        <div class="token-input-row">
+          <input type="password" class="form-input" id="tokenInput" placeholder="Paste your GitHub Personal Access Token..." />
+          <button class="btn-save btn-sm" onclick="saveToken()">Save</button>
+        </div>
+        <p class="token-hint">
+          <a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create a token</a> with <strong>repo</strong> scope — saved locally in your browser only.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note Title *</label>
+        <input type="text" class="form-input" id="noteTitle" />
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-select" id="noteCategory" onchange="updateSubcategories()">
+            <option value="powerapps" data-label="Power Apps">Power Apps</option>
+            <option value="powerautomate" data-label="Power Automate">Power Automate</option>
+            <option value="powerbi" data-label="Power BI">Power BI</option>
+            <option value="sharepoint" data-label="SharePoint">SharePoint</option>
+            <option value="other" data-label="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subcategory</label>
+          <select class="form-select" id="noteSubcategory"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="noteDate" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Short Description *</label>
+        <input type="text" class="form-input" id="noteExcerpt" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" class="form-input" id="noteTags" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note Content (Markdown) *</label>
+        <textarea class="form-textarea" id="noteContent"></textarea>
+        <p class="form-hint">Edit your note content directly. Changes save straight to GitHub.</p>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-save" id="saveBtn" onclick="saveNote()">
+          <span id="saveBtnText">⬆ Save Changes to GitHub</span>
+        </button>
+        <button class="btn-danger" id="deleteBtn" onclick="deleteNote()">✕ Delete Note</button>
+        <a href="#" id="cancelLink" class="btn-secondary">Cancel</a>
+      </div>
+
+      <div class="status-msg" id="statusMsg"></div>
+    </div>
+  </main>
+
+  <script src="notes-data.js"></script>
+  <script>
+    const GITHUB_USER = 'vandam2';
+    const GITHUB_REPO = 'vandam2.github.io';
+    const GITHUB_BRANCH = 'main';
+
+    // Theme
+    const saved = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '☾';
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
+    });
+
+    // Token
+    function saveToken() {
+      const val = document.getElementById('tokenInput').value.trim();
+      if (!val) return;
+      localStorage.setItem('gh_token', val);
+      document.getElementById('tokenInput').value = '';
+      updateTokenStatus();
+      if (note) loadNoteContent();
+    }
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function updateTokenStatus() {
+      const el = document.getElementById('tokenStatus');
+      if (getToken()) { el.textContent = '✓ Connected'; el.className = 'token-status set'; }
+      else { el.textContent = 'Not set'; el.className = 'token-status unset'; }
+    }
+    updateTokenStatus();
+
+    // GitHub API
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
+      return r.json();
+    }
+    async function ghPut(path, content, message, sha) {
+      const body = { message, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `PUT failed: ${r.status}`); }
+      return r.json();
+    }
+    async function ghDelete(path, message, sha) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'DELETE',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sha, branch: GITHUB_BRANCH })
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `DELETE failed: ${r.status}`); }
+      return r.json();
+    }
+
+    function setStatus(type, msg) {
+      const el = document.getElementById('statusMsg');
+      el.className = `status-msg ${type}`;
+      if (type === 'saving') el.innerHTML = `<div class="spinner"></div> ${msg}`;
+      else if (type === 'success') el.innerHTML = `<span>✅</span> ${msg}`;
+      else el.innerHTML = msg;
+    }
+
+    function slugify(t) { return t.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').trim(); }
+
+    // Load note
+    const params = new URLSearchParams(window.location.search);
+    const noteId = params.get('note');
+    const note = NOTES.find(n => n.id === noteId);
+    let mdFileSha = null;
+
+    function updateSubcategories(keepVal) {
+      const cat = document.getElementById('noteCategory').value;
+      const sub = document.getElementById('noteSubcategory');
+      const cur = keepVal || sub.value;
+      sub.innerHTML = (SUBCATEGORIES[cat] || ['Other']).map(s => `<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');
+    }
+
+    async function loadNoteContent() {
+      if (!note || !getToken()) return;
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('show');
+      try {
+        const f = await ghGet(note.file);
+        mdFileSha = f.sha;
+        const content = decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
+        document.getElementById('noteContent').value = content;
+      } catch(e) {
+        document.getElementById('noteContent').value = `# ${note.title}\n\n<!-- Could not load current content: ${e.message} -->\n<!-- Add your content here -->`;
+      } finally {
+        overlay.classList.remove('show');
+      }
+    }
+
+    if (!note) {
+      document.getElementById('pageTitle').textContent = 'Note not found';
+    } else {
+      document.title = `Edit: ${note.title} — NoteBase`;
+      document.getElementById('pageTitle').textContent = note.title;
+      document.getElementById('noteTitle').value   = note.title;
+      document.getElementById('noteExcerpt').value = note.excerpt;
+      document.getElementById('noteTags').value    = note.tags.join(', ');
+      document.getElementById('noteDate').value    = note.date;
+      document.getElementById('backLink').href     = `viewer.html?note=${note.id}`;
+      document.getElementById('cancelLink').href   = `viewer.html?note=${note.id}`;
+
+      const catSel = document.getElementById('noteCategory');
+      for (let o of catSel.options) { if (o.value === note.category) { o.selected = true; break; } }
+      updateSubcategories(note.subcategory);
+
+      if (getToken()) loadNoteContent();
+      else document.getElementById('noteContent').value = `# ${note.title}\n\n<!-- Set your GitHub token above to auto-load content -->`;
+    }
+
+    async function saveNote() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const title   = document.getElementById('noteTitle').value.trim();
+      const cat     = document.getElementById('noteCategory').value;
+      const catLbl  = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
+      const subcat  = document.getElementById('noteSubcategory').value;
+      const excerpt = document.getElementById('noteExcerpt').value.trim();
+      const tagsRaw = document.getElementById('noteTags').value.trim();
+      const date    = document.getElementById('noteDate').value;
+      const content = document.getElementById('noteContent').value.trim();
+      if (!title || !excerpt || !content) { alert('Please fill in Title, Description, and Content.'); return; }
+
+      const tags = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`) : ['"general"'];
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      document.getElementById('saveBtnText').textContent = 'Saving...';
+      setStatus('saving', 'Updating markdown file on GitHub...');
+
+      try {
+        // Update .md file
+        await ghPut(note.file, content, `Update note: ${title}`, mdFileSha);
+
+        setStatus('saving', 'Updating notes catalog...');
+
+        const newEntry = `  {\n    id: "${note.id}",\n    title: "${title}",\n    category: "${cat}",\n    categoryLabel: "${catLbl}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt.replace(/"/g,'\\"')}",\n    tags: [${tags.join(', ')}],\n    file: "${note.file}",\n    date: "${date}"\n  }`;
+
+        // Retry loop for SHA conflicts
+        let attempts = 0;
+        while (attempts < 3) {
+          try {
+            const dataFile = await ghGet('notes-data.js');
+            let jsContent = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+            const idPattern = new RegExp(`\\s*\\{[^}]*?id:\\s*"${note.id}"[^}]*?\\}\\s*,?`, 's');
+            if (idPattern.test(jsContent)) {
+              jsContent = jsContent.replace(idPattern, `\n${newEntry},`);
+            }
+            await ghPut('notes-data.js', jsContent, `Update note entry: ${title}`, dataFile.sha);
+            break;
+          } catch(e) {
+            attempts++;
+            if (attempts >= 3) throw e;
+            setStatus('saving', `Retrying... (attempt ${attempts + 1})`);
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+
+        setStatus('success', `Changes saved! Your site will update in about 30 seconds. <a href="viewer.html?note=${note.id}" style="color:var(--accent);margin-left:8px;">← Back to note</a>`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = '⬆ Save Changes to GitHub';
+
+      } catch(err) {
+        setStatus('error', `<strong>Error:</strong> ${err.message}<br><small>Check your token has 'repo' scope.</small>`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = '⬆ Save Changes to GitHub';
+      }
+    }
+
+    async function deleteNote() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      if (!confirm(`Delete "${note.title}"? This cannot be undone.`)) return;
+
+      const btn = document.getElementById('deleteBtn');
+      btn.disabled = true;
+      setStatus('saving', 'Deleting note from GitHub...');
+
+      try {
+        // Delete .md file
+        const mdFile = await ghGet(note.file);
+        await ghDelete(note.file, `Delete note: ${note.title}`, mdFile.sha);
+
+        setStatus('saving', 'Removing from notes catalog...');
+
+        // Remove entry from notes-data.js
+        const dataFile = await ghGet('notes-data.js');
+        let jsContent = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+        const idPattern = new RegExp(`\\s*\\{[^}]*?id:\\s*"${note.id}"[^}]*?\\}\\s*,?`, 's');
+        jsContent = jsContent.replace(idPattern, '');
+        await ghPut('notes-data.js', jsContent, `Delete note: ${note.title}`, dataFile.sha);
+
+        setStatus('success', `Note deleted! Redirecting to homepage... <a href="index.html" style="color:var(--accent)">Go now</a>`);
+        setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+
+      } catch(err) {
+        setStatus('error', `<strong>Error:</strong> ${err.message}`);
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
