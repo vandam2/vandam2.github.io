@@ -10,140 +10,49 @@
   <style>
     .form-section { max-width: 780px; }
     .form-group { margin-bottom: 24px; }
-    .form-label {
-      display: block;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .form-input, .form-select, .form-textarea {
-      width: 100%;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-family: 'Figtree', sans-serif;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-    .form-select option { background: var(--bg-2); }
-    .form-textarea {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      line-height: 1.7;
-      resize: vertical;
-      min-height: 380px;
-    }
-    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 10px;
-      font-family: 'Figtree', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      box-shadow: 0 4px 16px rgba(79,142,247,0.3);
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(79,142,247,0.45); }
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-family: 'Figtree', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
-    .output-box {
-      display: none;
-      margin-top: 24px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .output-header {
-      background: var(--bg-3);
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .output-title { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
-    .btn-copy {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-family: 'DM Mono', monospace;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-copy:hover { opacity: 0.85; }
-    .output-content {
-      padding: 20px;
-      font-family: 'DM Mono', monospace;
-      font-size: 12.5px;
-      color: var(--text);
-      line-height: 1.7;
-      white-space: pre-wrap;
-      word-break: break-all;
-      background: var(--bg-2);
-      max-height: 320px;
-      overflow-y: auto;
-    }
-    .steps-box {
-      display: none;
-      margin-top: 20px;
-      background: var(--accent-glow);
-      border: 1px solid rgba(79,142,247,0.2);
-      border-radius: 12px;
-      padding: 20px 24px;
-    }
-    .steps-box h3 { font-family: 'Calibri', 'Trebuchet MS', 'Segoe UI', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--accent); }
-    .steps-box ol { padding-left: 20px; font-size: 13.5px; color: var(--text); line-height: 2; }
-    .steps-box code { background: var(--bg-3); padding: 1px 7px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent-2); }
-    .copied { background: #22c55e !important; }
-    @media (max-width: 700px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
+    .form-label { display:block; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+    .form-input, .form-select, .form-textarea { width:100%; background:var(--bg-2); border:1px solid var(--border); color:var(--text); padding:12px 16px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:15px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+    .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+    .form-select option { background:var(--bg-2); }
+    .form-textarea { font-family:'DM Mono',monospace; font-size:13px; line-height:1.7; resize:vertical; min-height:380px; }
+    .form-hint { font-size:12px; color:var(--text-muted); margin-top:6px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+    /* Token setup box */
+    .token-box { background:var(--bg-2); border:1px solid var(--border); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+    .token-box-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .token-box-title { font-family:'Calibri','Trebuchet MS','Segoe UI',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+    .token-status { font-family:'DM Mono',monospace; font-size:11px; padding:3px 10px; border-radius:100px; }
+    .token-status.set { background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); }
+    .token-status.unset { background:rgba(239,68,68,0.12); color:#ef4444; border:1px solid rgba(239,68,68,0.25); }
+    .token-input-row { display:flex; gap:10px; }
+    .token-hint { font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.6; }
+    .token-hint a { color:var(--accent); }
+
+    /* Buttons */
+    .btn-save { background:var(--accent); color:#fff; border:none; padding:13px 32px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.15s; box-shadow:0 4px 16px rgba(79,142,247,0.3); display:inline-flex; align-items:center; gap:8px; }
+    .btn-save:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 22px rgba(79,142,247,0.45); }
+    .btn-save:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .btn-secondary { background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:13px 20px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.15s; text-decoration:none; display:inline-block; }
+    .btn-secondary:hover { color:var(--text); border-color:rgba(255,255,255,0.2); }
+    .btn-sm { padding:8px 16px; font-size:13px; border-radius:8px; }
+    .form-actions { display:flex; gap:12px; align-items:center; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
+
+    /* Status messages */
+    .status-msg { display:none; padding:14px 18px; border-radius:10px; font-size:14px; margin-top:20px; line-height:1.5; }
+    .status-msg.saving { display:flex; align-items:center; gap:10px; background:var(--accent-glow); border:1px solid rgba(79,142,247,0.2); color:var(--accent); }
+    .status-msg.success { display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); color:#22c55e; }
+    .status-msg.error { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#ef4444; }
+    .spinner { width:16px; height:16px; border:2px solid rgba(79,142,247,0.3); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    @media (max-width:700px) { .form-row,.form-row-3 { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
-
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <span class="logo-icon">⬡</span>
-      <span class="logo-text">NoteBase</span>
-    </div>
+    <div class="sidebar-logo"><span class="logo-icon">⬡</span><span class="logo-text">NoteBase</span></div>
     <nav class="sidebar-nav">
       <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
       <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
@@ -159,32 +68,47 @@
 
   <main class="main">
     <a href="index.html" class="viewer-back">← Back to all notes</a>
-
-    <div class="page-header" style="margin-bottom: 32px;">
+    <div class="page-header" style="margin-bottom:28px;">
       <p class="header-label">CREATE A NOTE</p>
       <h1 class="header-title">New Note</h1>
     </div>
 
     <div class="form-section">
 
+      <!-- GitHub Token Setup -->
+      <div class="token-box">
+        <div class="token-box-header">
+          <span class="token-box-title">🔑 GitHub Connection</span>
+          <span class="token-status unset" id="tokenStatus">Not set</span>
+        </div>
+        <div class="token-input-row">
+          <input type="password" class="form-input" id="tokenInput" placeholder="Paste your GitHub Personal Access Token..." />
+          <button class="btn-save btn-sm" onclick="saveToken()">Save</button>
+        </div>
+        <p class="token-hint">
+          Your token is saved locally in your browser and never sent anywhere except GitHub.<br>
+          <a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Click here to create a token</a> — select <strong>repo</strong> scope → Generate → copy and paste above.
+        </p>
+      </div>
+
       <div class="form-group">
         <label class="form-label">Note Title *</label>
-        <input type="text" class="form-input" id="noteTitle" placeholder="e.g. Gallery Delegation Tips" />
+        <input type="text" class="form-input" id="noteTitle" placeholder="e.g. Hide Navbar on Power Apps" />
       </div>
 
       <div class="form-row-3">
         <div class="form-group">
           <label class="form-label">Category *</label>
           <select class="form-select" id="noteCategory" onchange="updateSubcategories()">
-            <option value="powerapps"     data-label="Power Apps">Power Apps</option>
+            <option value="powerapps" data-label="Power Apps">Power Apps</option>
             <option value="powerautomate" data-label="Power Automate">Power Automate</option>
-            <option value="powerbi"       data-label="Power BI">Power BI</option>
-            <option value="sharepoint"    data-label="SharePoint">SharePoint</option>
-            <option value="other"         data-label="Other">Other</option>
+            <option value="powerbi" data-label="Power BI">Power BI</option>
+            <option value="sharepoint" data-label="SharePoint">SharePoint</option>
+            <option value="other" data-label="Other">Other</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Subcategory *</label>
+          <label class="form-label">Subcategory</label>
           <select class="form-select" id="noteSubcategory"></select>
         </div>
         <div class="form-group">
@@ -194,8 +118,8 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Short Description (shown on card) *</label>
-        <input type="text" class="form-input" id="noteExcerpt" placeholder="One or two sentence summary of this note..." />
+        <label class="form-label">Short Description *</label>
+        <input type="text" class="form-input" id="noteExcerpt" placeholder="One or two sentence summary shown on the card..." />
       </div>
 
       <div class="form-group">
@@ -205,62 +129,27 @@
 
       <div class="form-group">
         <label class="form-label">Note Content (Markdown) *</label>
-        <textarea class="form-textarea" id="noteContent" placeholder="# Your Note Title
-
-## Section One
-Write your note content here using Markdown...
-
-## Code Example
-\`\`\`
-Patch(MyList, {Title: &quot;Hello&quot;})
-\`\`\`
-
-## Tips
-- Tip one
-- Tip two
-"></textarea>
+        <textarea class="form-textarea" id="noteContent" placeholder="# Your Note Title&#10;&#10;## Section One&#10;Write your note content here...&#10;&#10;## Code Example&#10;```&#10;Patch(MyList, {Title: &quot;Hello&quot;})&#10;```"></textarea>
         <p class="form-hint">Supports full Markdown — headings, bold, code blocks, lists, tables.</p>
       </div>
 
       <div class="form-actions">
-        <button class="btn-primary" onclick="generateNote()">Generate Files ↓</button>
+        <button class="btn-save" id="saveBtn" onclick="saveNote()">
+          <span id="saveBtnText">⬆ Save to GitHub</span>
+        </button>
         <a href="index.html" class="btn-secondary">Cancel</a>
       </div>
 
-      <!-- Markdown Output -->
-      <div class="output-box" id="outputBox">
-        <div class="output-header">
-          <span class="output-title" id="outputLabel">notes/powerapps/your-note.md</span>
-          <button class="btn-copy" onclick="copyContent(event)">Copy</button>
-        </div>
-        <div class="output-content" id="outputContent"></div>
-      </div>
-
-      <!-- notes-data.js entry -->
-      <div class="output-box" id="outputBox2">
-        <div class="output-header">
-          <span class="output-title">notes-data.js — paste this inside the NOTES array</span>
-          <button class="btn-copy" onclick="copyEntry(event)">Copy</button>
-        </div>
-        <div class="output-content" id="outputEntry"></div>
-      </div>
-
-      <!-- Steps -->
-      <div class="steps-box" id="stepsBox">
-        <h3>📋 Next Steps — Publish this note</h3>
-        <ol>
-          <li>Copy the <strong>Markdown content</strong> → save as <code id="stepFilename"></code> on your computer</li>
-          <li>Copy the <strong>notes-data.js entry</strong> → open <code>notes-data.js</code> on GitHub and paste it inside the <code>NOTES</code> array</li>
-          <li>Drag the new <code>.md</code> file into the Netlify deploy box (or redeploy the whole folder)</li>
-          <li>Your new note card will appear on the homepage within 30 seconds ✅</li>
-        </ol>
-      </div>
-
+      <div class="status-msg" id="statusMsg"></div>
     </div>
   </main>
 
   <script src="notes-data.js"></script>
   <script>
+    const GITHUB_USER = 'vandam2';
+    const GITHUB_REPO = 'vandam2.github.io';
+    const GITHUB_BRANCH = 'main';
+
     // Theme
     const saved = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', saved);
@@ -272,78 +161,116 @@ Patch(MyList, {Title: &quot;Hello&quot;})
       document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
     });
 
-    // Set today's date
+    // Token
+    function saveToken() {
+      const val = document.getElementById('tokenInput').value.trim();
+      if (!val) return;
+      localStorage.setItem('gh_token', val);
+      document.getElementById('tokenInput').value = '';
+      updateTokenStatus();
+    }
+
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+    function updateTokenStatus() {
+      const el = document.getElementById('tokenStatus');
+      if (getToken()) {
+        el.textContent = '✓ Connected'; el.className = 'token-status set';
+      } else {
+        el.textContent = 'Not set'; el.className = 'token-status unset';
+      }
+    }
+    updateTokenStatus();
+
+    // Date & subcategories
     document.getElementById('noteDate').value = new Date().toISOString().split('T')[0];
 
-    // Populate subcategories based on selected category
     function updateSubcategories() {
       const cat = document.getElementById('noteCategory').value;
-      const subSelect = document.getElementById('noteSubcategory');
-      const options = SUBCATEGORIES[cat] || ['Other'];
-      subSelect.innerHTML = options.map(s => `<option value="${s}">${s}</option>`).join('');
+      const sub = document.getElementById('noteSubcategory');
+      sub.innerHTML = (SUBCATEGORIES[cat] || ['Other']).map(s => `<option value="${s}">${s}</option>`).join('');
     }
-    updateSubcategories(); // init on load
+    updateSubcategories();
 
-    function slugify(text) {
-      return text.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-').trim();
+    function slugify(t) { return t.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').trim(); }
+
+    // GitHub API helpers
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
+      return r.json();
     }
 
-    function generateNote() {
-      const title    = document.getElementById('noteTitle').value.trim();
-      const category = document.getElementById('noteCategory').value;
-      const catLabel = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
-      const subcat   = document.getElementById('noteSubcategory').value;
-      const excerpt  = document.getElementById('noteExcerpt').value.trim();
-      const tagsRaw  = document.getElementById('noteTags').value.trim();
-      const date     = document.getElementById('noteDate').value;
-      const content  = document.getElementById('noteContent').value.trim();
+    async function ghPut(path, content, message, sha) {
+      const body = { message, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `PUT failed: ${r.status}`); }
+      return r.json();
+    }
 
-      if (!title || !excerpt || !content) {
-        alert('Please fill in Title, Description, and Content.');
-        return;
+    function setStatus(type, msg) {
+      const el = document.getElementById('statusMsg');
+      el.className = `status-msg ${type}`;
+      if (type === 'saving') el.innerHTML = `<div class="spinner"></div> ${msg}`;
+      else if (type === 'success') el.innerHTML = `<span>✅</span> ${msg}`;
+      else el.innerHTML = msg;
+    }
+
+    async function saveNote() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+
+      const title   = document.getElementById('noteTitle').value.trim();
+      const cat     = document.getElementById('noteCategory').value;
+      const catLbl  = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
+      const subcat  = document.getElementById('noteSubcategory').value;
+      const excerpt = document.getElementById('noteExcerpt').value.trim();
+      const tagsRaw = document.getElementById('noteTags').value.trim();
+      const date    = document.getElementById('noteDate').value;
+      const content = document.getElementById('noteContent').value.trim();
+
+      if (!title || !excerpt || !content) { alert('Please fill in Title, Description, and Content.'); return; }
+
+      const slug     = slugify(title);
+      const filePath = `notes/${cat}/${slug}.md`;
+      const tags     = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`) : ['"general"'];
+
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      document.getElementById('saveBtnText').textContent = 'Saving...';
+      setStatus('saving', 'Creating markdown file on GitHub...');
+
+      try {
+        // 1 — Write the .md file
+        await ghPut(filePath, content, `Add note: ${title}`);
+
+        setStatus('saving', 'Updating notes catalog...');
+
+        // 2 — Update notes-data.js
+        const dataFile = await ghGet('notes-data.js');
+        const oldContent = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+
+        const newEntry = `  {\n    id: "${slug}",\n    title: "${title}",\n    category: "${cat}",\n    categoryLabel: "${catLbl}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt.replace(/"/g,'\\"')}",\n    tags: [${tags.join(', ')}],\n    file: "${filePath}",\n    date: "${date}"\n  },`;
+
+        // Insert new entry after the opening of NOTES array
+        const updatedContent = oldContent.replace('const NOTES = [', `const NOTES = [\n${newEntry}`);
+        await ghPut('notes-data.js', updatedContent, `Add note entry: ${title}`, dataFile.sha);
+
+        setStatus('success', `Note saved! Your site will update in about 30 seconds. <a href="index.html" style="color:var(--accent);margin-left:8px;">← Go to homepage</a>`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = '⬆ Save to GitHub';
+
+      } catch(err) {
+        setStatus('error', `<strong>Error:</strong> ${err.message}<br><small>Check your token has 'repo' access and try again.</small>`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = '⬆ Save to GitHub';
       }
-
-      const slug = slugify(title);
-      const tags = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`).join(', ') : '"general"';
-      const filePath = `notes/${category}/${slug}.md`;
-
-      document.getElementById('outputBox').style.display = 'block';
-      document.getElementById('outputLabel').textContent = filePath;
-      document.getElementById('outputContent').textContent = content;
-
-      const entry = `  {
-    id: "${slug}",
-    title: "${title}",
-    category: "${category}",
-    categoryLabel: "${catLabel}",
-    subcategory: "${subcat}",
-    excerpt: "${excerpt}",
-    tags: [${tags}],
-    file: "${filePath}",
-    date: "${date}"
-  },`;
-
-      document.getElementById('outputBox2').style.display = 'block';
-      document.getElementById('outputEntry').textContent = entry;
-      document.getElementById('stepsBox').style.display = 'block';
-      document.getElementById('stepFilename').textContent = filePath;
-
-      document.getElementById('outputBox').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function copyContent(e) {
-      navigator.clipboard.writeText(document.getElementById('outputContent').textContent);
-      e.target.textContent = 'Copied!'; e.target.classList.add('copied');
-      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 2000);
-    }
-
-    function copyEntry(e) {
-      navigator.clipboard.writeText(document.getElementById('outputEntry').textContent);
-      e.target.textContent = 'Copied!'; e.target.classList.add('copied');
-      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 2000);
     }
   </script>
 </body>
