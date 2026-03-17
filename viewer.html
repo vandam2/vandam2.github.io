@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Note — NoteBase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .viewer-actions { display:flex; gap:10px; align-items:center; margin-left:auto; }
+    .btn-edit { background:var(--bg-3); border:1px solid var(--border); color:var(--text-muted); padding:8px 18px; border-radius:8px; font-family:'Figtree',sans-serif; font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; }
+    .btn-edit:hover { background:var(--bg-2); color:var(--accent); border-color:var(--accent); }
+    .btn-delete { background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:8px 18px; border-radius:8px; font-family:'Figtree',sans-serif; font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; }
+    .btn-delete:hover { border-color:#ef4444; color:#ef4444; background:rgba(239,68,68,0.08); }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--bg-2); border:1px solid var(--border); border-radius:20px; padding:32px; max-width:480px; width:90%; box-shadow:0 24px 80px rgba(0,0,0,0.5); }
+    .modal-icon { font-size:36px; margin-bottom:16px; }
+    .modal h2 { font-family:'Calibri','Trebuchet MS','Segoe UI',sans-serif; font-size:20px; font-weight:800; margin-bottom:10px; }
+    .modal p { font-size:14px; color:var(--text-muted); margin-bottom:20px; line-height:1.6; }
+    .modal-token { margin-bottom:20px; }
+    .modal-token-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:1px; color:var(--accent); margin-bottom:8px; display:block; }
+    .modal-token-row { display:flex; gap:8px; }
+    .modal-token-row input { flex:1; background:var(--bg-3); border:1px solid var(--border); color:var(--text); padding:9px 14px; border-radius:8px; font-family:'Figtree',sans-serif; font-size:14px; outline:none; }
+    .modal-token-row input:focus { border-color:var(--accent); }
+    .token-badge { font-family:'DM Mono',monospace; font-size:11px; padding:3px 10px; border-radius:100px; margin-top:6px; display:inline-block; }
+    .token-badge.set { background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); }
+    .token-badge.unset { background:rgba(239,68,68,0.12); color:#ef4444; border:1px solid rgba(239,68,68,0.25); }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; margin-top:20px; }
+    .btn-modal-cancel { background:var(--bg-3); border:1px solid var(--border); color:var(--text-muted); padding:9px 20px; border-radius:8px; font-family:'Figtree',sans-serif; font-size:14px; cursor:pointer; }
+    .btn-modal-cancel:hover { color:var(--text); }
+    .btn-modal-delete { background:#ef4444; border:none; color:#fff; padding:9px 24px; border-radius:8px; font-family:'Figtree',sans-serif; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+    .btn-modal-delete:hover:not(:disabled) { background:#dc2626; }
+    .btn-modal-delete:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-save-token { background:var(--accent); border:none; color:#fff; padding:9px 16px; border-radius:8px; font-family:'Figtree',sans-serif; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .delete-status { display:none; margin-top:14px; padding:12px 16px; border-radius:8px; font-size:13px; line-height:1.5; }
+    .delete-status.saving { display:flex; align-items:center; gap:10px; background:var(--accent-glow); border:1px solid rgba(79,142,247,0.2); color:var(--accent); }
+    .delete-status.success { display:block; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); color:#22c55e; }
+    .delete-status.error { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#ef4444; }
+    .spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+    .spinner-blue { width:14px; height:14px; border:2px solid rgba(79,142,247,0.3); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span class="logo-icon">⬡</span><span class="logo-text">NoteBase</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
+      <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
+      <a href="index.html?cat=powerautomate" class="nav-item"><span class="nav-icon">↻</span> Power Automate</a>
+      <a href="index.html?cat=powerbi" class="nav-item"><span class="nav-icon">◈</span> Power BI</a>
+      <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
+      <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap;">
+      <a href="index.html" class="viewer-back" style="margin-bottom:0;">← Back</a>
+      <div class="viewer-actions">
+        <a id="editBtn" href="#" class="btn-edit">✎ Edit</a>
+        <button class="btn-delete" onclick="openDeleteModal()">✕ Delete</button>
+      </div>
+    </div>
+
+    <div id="noteContainer">
+      <div class="viewer-header">
+        <div class="viewer-meta">
+          <span class="card-category" id="viewerCategory">...</span>
+          <span id="viewerSubcat" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);"></span>
+          <span class="viewer-date" id="viewerDate"></span>
+        </div>
+        <h1 class="viewer-title" id="viewerTitle">Loading...</h1>
+        <div class="card-tags" id="viewerTags"></div>
+      </div>
+      <article class="note-content" id="noteContent">
+        <p style="color:var(--text-muted);">Loading note...</p>
+      </article>
+    </div>
+  </main>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon">🗑️</div>
+      <h2>Delete this note?</h2>
+      <p>This permanently removes the note from GitHub. Your site updates automatically within 30 seconds. This cannot be undone.</p>
+
+      <div class="modal-token">
+        <span class="modal-token-label">GITHUB CONNECTION</span>
+        <div id="tokenConnected" style="display:none;">
+          <span class="token-badge set">✓ Connected — ready to delete</span>
+        </div>
+        <div id="tokenNotSet">
+          <div class="modal-token-row">
+            <input type="password" id="modalTokenInput" placeholder="Paste your GitHub Personal Access Token..." />
+            <button class="btn-save-token" onclick="saveModalToken()">Save</button>
+          </div>
+          <div style="margin-top:6px;">
+            <span class="token-badge unset">Not connected</span>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">
+              <a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank" style="color:var(--accent);">Create token</a> with repo scope
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="delete-status" id="deleteStatus"></div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-modal-delete" id="confirmDeleteBtn" onclick="confirmDelete()">
+          <span id="deleteBtnText">🗑 Yes, Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="notes-data.js"></script>
+  <script>
+    const GITHUB_USER   = 'vandam2';
+    const GITHUB_REPO   = 'vandam2.github.io';
+    const GITHUB_BRANCH = 'main';
+
+    // Theme
+    const saved = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '☾';
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
+    });
+
+    // Token
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function saveModalToken() {
+      const val = document.getElementById('modalTokenInput').value.trim();
+      if (!val) return;
+      localStorage.setItem('gh_token', val);
+      document.getElementById('modalTokenInput').value = '';
+      updateModalTokenUI();
+    }
+    function updateModalTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
+    }
+
+    // Load note
+    const params = new URLSearchParams(window.location.search);
+    const note   = NOTES.find(n => n.id === params.get('note'));
+
+    function formatDate(d) { return d ? new Date(d).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : ''; }
+
+    if (!note) {
+      document.getElementById('viewerTitle').textContent = 'Note not found';
+      document.getElementById('noteContent').innerHTML = '<p>This note does not exist. <a href="index.html">Go back home.</a></p>';
+      document.getElementById('editBtn').style.display = 'none';
+    } else {
+      document.title = `${note.title} — NoteBase`;
+      document.getElementById('viewerTitle').textContent = note.title;
+      document.getElementById('viewerDate').textContent  = formatDate(note.date);
+      if (note.subcategory) document.getElementById('viewerSubcat').textContent = '· ' + note.subcategory;
+      const catEl = document.getElementById('viewerCategory');
+      catEl.textContent = note.categoryLabel;
+      catEl.className   = `card-category cat-${note.category}`;
+      document.getElementById('viewerTags').innerHTML = note.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+      document.getElementById('editBtn').href = `edit-note.html?note=${note.id}`;
+
+      fetch(note.file)
+        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+        .then(md => { document.getElementById('noteContent').innerHTML = marked.parse(md); })
+        .catch(() => {
+          document.getElementById('noteContent').innerHTML = `<p style="color:var(--text-muted)">Markdown file not found at <code>${note.file}</code>.</p>`;
+        });
+    }
+
+    // Modal
+    function openDeleteModal() {
+      updateModalTokenUI();
+      document.getElementById('deleteStatus').className = 'delete-status';
+      document.getElementById('confirmDeleteBtn').disabled = false;
+      document.getElementById('deleteBtnText').textContent = '🗑 Yes, Delete';
+      document.getElementById('deleteModal').classList.add('open');
+    }
+    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); }
+    document.getElementById('deleteModal').addEventListener('click', e => { if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); });
+
+    // GitHub API
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+        headers: { Authorization:`token ${getToken()}`, Accept:'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`Could not read ${path} (${r.status})`);
+      return r.json();
+    }
+    async function ghDelete(path, msg, sha) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method:'DELETE',
+        headers:{ Authorization:`token ${getToken()}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' },
+        body: JSON.stringify({ message:msg, sha, branch:GITHUB_BRANCH })
+      });
+      if (!r.ok) { const e=await r.json(); throw new Error(e.message||`Delete failed (${r.status})`); }
+    }
+    async function ghPut(path, content, msg, sha) {
+      const body = { message:msg, content:btoa(unescape(encodeURIComponent(content))), branch:GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method:'PUT',
+        headers:{ Authorization:`token ${getToken()}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e=await r.json(); throw new Error(e.message||`Update failed (${r.status})`); }
+    }
+
+    function setDeleteStatus(type, msg) {
+      const el = document.getElementById('deleteStatus');
+      el.className = `delete-status ${type}`;
+      el.innerHTML = type==='saving' ? `<div class="spinner-blue"></div> ${msg}` : msg;
+    }
+
+    async function confirmDelete() {
+      if (!getToken()) { alert('Please paste your GitHub token first.'); return; }
+      const btn = document.getElementById('confirmDeleteBtn');
+      btn.disabled = true;
+      document.getElementById('deleteBtnText').innerHTML = '<div class="spinner"></div> Deleting...';
+      setDeleteStatus('saving', 'Deleting markdown file...');
+      try {
+        // Delete the .md file — skip gracefully if it doesn't exist
+        try {
+          const mdFile = await ghGet(note.file);
+          await ghDelete(note.file, `Delete note: ${note.title}`, mdFile.sha);
+        } catch(e) {
+          // File may not exist on GitHub — that's fine, continue to remove catalog entry
+          console.log('MD file not found, skipping:', e.message);
+        }
+
+        setDeleteStatus('saving', 'Removing from notes catalog...');
+
+        // Retry loop for SHA conflicts on notes-data.js
+        let attempts = 0;
+        while (attempts < 3) {
+          try {
+            const dataFile = await ghGet('notes-data.js');
+            let js = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+            js = js.replace(new RegExp(`\\s*\\{[^{}]*?id:\\s*"${note.id}"[^{}]*?\\}\\s*,?`,'s'), '');
+            await ghPut('notes-data.js', js, `Delete note: ${note.title}`, dataFile.sha);
+            break;
+          } catch(e) {
+            attempts++;
+            if (attempts >= 3) throw e;
+            setDeleteStatus('saving', `Retrying... (attempt ${attempts + 1})`);
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+
+        setDeleteStatus('success', '✅ Note deleted! Redirecting to homepage...');
+        setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+      } catch(err) {
+        setDeleteStatus('error', `<strong>Error:</strong> ${err.message}<br><small>Try again — if it persists check your token has 'repo' scope.</small>`);
+        btn.disabled = false;
+        document.getElementById('deleteBtnText').textContent = '🗑 Yes, Delete';
+      }
+    }
+  </script>
+</body>
+</html>
