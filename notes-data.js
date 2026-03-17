@@ -93,17 +93,6 @@ const NOTES = [
     date: "2024-12-18"
   },
   {
-    id: "sp-permissions",
-    title: "Permissions Architecture — Breaking Inheritance",
-    category: "sharepoint",
-    categoryLabel: "SharePoint",
-    subcategory: "Permissions",
-    excerpt: "When and how to break permission inheritance on items/folders without creating an unmanageable mess. Patterns for department-level access control.",
-    tags: ["permissions", "security", "governance"],
-    file: "notes/sharepoint/permissions.md",
-    date: "2024-12-01"
-  },
-  {
     id: "other-json-tricks",
     title: "JSON in Power Platform — Parse, Schema, Escape",
     category: "other",
