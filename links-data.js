@@ -4,6 +4,15 @@
 
 const LINKS = [
   {
+    id: "the-powerapps-guy-77519",
+    title: "The Powerapps guy",
+    url: "https://www.youtube.com/@PowerAppsGuy/videos",
+    description: "youtube channel",
+    category: "powerapps",
+    subcategory: "Other",
+    date: "2026-03-18"
+  },
+  {
     id: "reza-dorrani-29616",
     title: "Reza Dorrani",
     url: "https://www.youtube.com/@RezaDorrani/videos",
