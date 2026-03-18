@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Prompt — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
+    </div>
+  </nav>
+  <div class="kb-breadcrumb">
+    <div class="container"><a href="index.html">Home</a><span class="sep">/</span><a href="#" id="bcBack">Prompt</a><span class="sep">/</span><span class="text-muted">Edit</span></div>
+  </div>
+
+  <div class="container kb-main">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="kb-form-card">
+          <h3 class="mb-0" id="pageTitle" style="font-family:'Nunito',sans-serif;font-weight:800;">Edit Prompt</h3>
+          <p class="text-muted small mb-4">Update your prompt and save to GitHub</p>
+
+          <div class="kb-token-box">
+            <div class="kb-token-label"><i class="bi bi-key me-1"></i>GitHub Connection</div>
+            <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected</span></div>
+            <div id="tokenNotSet">
+              <span class="token-not-set d-inline-block mb-2"><i class="bi bi-x-circle me-1"></i>Not set</span>
+              <div class="input-group">
+                <input type="password" class="form-control form-control-sm" id="tokenInput" placeholder="Paste GitHub Personal Access Token..."/>
+                <button class="btn btn-primary btn-sm" onclick="saveToken()">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-control" id="promptTitle"/>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Category *</label>
+              <select class="form-select" id="promptCategory">
+                <option value="powerapps">Power Apps</option>
+                <option value="powerautomate">Power Automate</option>
+                <option value="powerbi">Power BI</option>
+                <option value="sharepoint">SharePoint</option>
+                <option value="m365">Microsoft 365</option>
+                <option value="general">General</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" id="promptDate"/>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Prompt Content</label>
+            <div class="editor-wrap"><div id="editor"></div></div>
+            <div class="form-text" id="loadHint" style="color:#0f4c81;">⏳ Loading content from GitHub...</div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn kb-btn-primary" id="saveBtn" onclick="savePrompt()">
+              <span id="saveBtnText"><i class="bi bi-cloud-upload me-1"></i>Save Changes</span>
+            </button>
+            <a href="#" id="cancelLink" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+          <div class="kb-status" id="statusMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="kb-footer mt-5"><div class="container text-center"><p class="mb-0 small">Vandam's Knowledge Base &copy; 2026</p></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+  <script>
+    const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
+    const CAT_LABELS = { powerapps:'Power Apps', powerautomate:'Power Automate', powerbi:'Power BI', sharepoint:'SharePoint', m365:'Microsoft 365', general:'General' };
+
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      placeholder: 'Content will load here...',
+      modules: { toolbar: [[{header:[1,2,3,false]}],['bold','italic','underline'],[{list:'ordered'},{list:'bullet'}],['code-block','blockquote'],['link','image'],['clean']] }
+    });
+
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function saveToken() {
+      const v = document.getElementById('tokenInput').value.trim();
+      if (!v) return;
+      localStorage.setItem('gh_token', v);
+      document.getElementById('tokenInput').value = '';
+      updateTokenUI();
+      if (window._prompt) loadContent();
+    }
+    function updateTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
+    }
+    updateTokenUI();
+
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
+      return r.json();
+    }
+    async function ghPut(path, content, msg, sha) {
+      const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT', headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'PUT failed'); }
+    }
+
+    function setStatus(type, msg) {
+      const el = document.getElementById('statusMsg');
+      el.className = `kb-status ${type}`;
+      el.innerHTML = type === 'saving' ? `<span class="spinner-border spinner-border-sm me-2"></span>${msg}` :
+                     type === 'success' ? `<i class="bi bi-check-circle me-2"></i>${msg}` : msg;
+    }
+
+    async function loadContent() {
+      const p = window._prompt;
+      if (!p || !getToken()) return;
+      try {
+        const f = await ghGet(p.file);
+        const content = decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
+        quill.root.innerHTML = content.trim().startsWith('<') ? content : `<p>${content}</p>`;
+        document.getElementById('loadHint').textContent = '✓ Content loaded';
+        document.getElementById('loadHint').style.color = '#1a7a4a';
+      } catch(e) {
+        document.getElementById('loadHint').textContent = 'Could not load — write fresh content above.';
+        document.getElementById('loadHint').style.color = '#718096';
+      }
+    }
+
+    async function savePrompt() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const p       = window._prompt;
+      const title   = document.getElementById('promptTitle').value.trim();
+      const cat     = document.getElementById('promptCategory').value;
+      const date    = document.getElementById('promptDate').value;
+      const content = quill.root.innerHTML;
+      if (!title) { alert('Please fill in Title.'); return; }
+
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      document.getElementById('saveBtnText').innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+      setStatus('saving', 'Updating prompt file...');
+
+      try {
+        const f = await ghGet(p.file);
+        await ghPut(p.file, content, `Update prompt: ${title}`, f.sha);
+        setStatus('saving', 'Updating catalog...');
+        await new Promise(r => setTimeout(r, 800));
+
+        const newEntry = `  {\n    id: "${p.id}",\n    title: "${title.replace(/"/g,'\\"')}",\n    category: "${cat}",\n    categoryLabel: "${CAT_LABELS[cat]}",\n    file: "${p.file}",\n    date: "${date}"\n  }`;
+
+        let attempts = 0;
+        while (attempts < 4) {
+          try {
+            const df = await ghGet('prompts-data.js');
+            let js = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
+            js = js.replace(new RegExp(`\\s*\\{[^{}]*?id:\\s*"${p.id}"[^{}]*?\\}\\s*,?`, 's'), `\n${newEntry},`);
+            await ghPut('prompts-data.js', js, `Update prompt: ${title}`, df.sha);
+            break;
+          } catch(e) { attempts++; if (attempts >= 4) throw e; setStatus('saving', `Retrying...`); await new Promise(r => setTimeout(r, 2000)); }
+        }
+
+        setStatus('success', `Saved! <a href="prompt-viewer.html?prompt=${p.id}" class="ms-2">← View prompt</a>`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save Changes';
+      } catch(err) {
+        setStatus('error', `<strong>Error:</strong> ${err.message}`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save Changes';
+      }
+    }
+
+    function init() {
+      updateTokenUI();
+      const params = new URLSearchParams(window.location.search);
+      const prompt = PROMPTS.find(p => p.id === params.get('prompt'));
+      if (!prompt) { document.getElementById('pageTitle').textContent = 'Prompt not found'; return; }
+      window._prompt = prompt;
+
+      document.title = `Edit: ${prompt.title}`;
+      document.getElementById('pageTitle').textContent = prompt.title;
+      document.getElementById('promptTitle').value = prompt.title;
+      document.getElementById('promptDate').value  = prompt.date || '';
+      document.getElementById('bcBack').href        = `prompt-viewer.html?prompt=${prompt.id}`;
+      document.getElementById('cancelLink').href    = `prompt-viewer.html?prompt=${prompt.id}`;
+
+      for (let o of document.getElementById('promptCategory').options) {
+        if (o.value === prompt.category) { o.selected = true; break; }
+      }
+
+      if (getToken()) loadContent();
+      else { document.getElementById('loadHint').textContent = '→ Set your GitHub token above to load content.'; document.getElementById('loadHint').style.color = '#718096'; }
+    }
+
+    const _s = document.createElement('script');
+    _s.src = 'prompts-data.js?v=' + Date.now();
+    _s.onload = init;
+    document.body.appendChild(_s);
+  </script>
+</body>
+</html>

@@ -25,8 +25,11 @@
           <li class="nav-item"><a class="nav-link active" href="index.html"><i class="bi bi-house"></i> Home</a></li>
           <li class="nav-item"><a class="nav-link" href="new-note.html"><i class="bi bi-file-plus"></i> New Note</a></li>
           <li class="nav-item"><a class="nav-link" href="manage-notes.html"><i class="bi bi-pencil-square"></i> Manage Notes</a></li>
+          <li class="nav-item"><a class="nav-link" href="new-prompt.html"><i class="bi bi-chat-square-text"></i> New Prompt</a></li>
+          <li class="nav-item"><a class="nav-link" href="manage-prompts.html"><i class="bi bi-pencil-square"></i> Manage Prompts</a></li>
           <li class="nav-item"><a class="nav-link" href="new-link.html"><i class="bi bi-link-45deg"></i> Add Link</a></li>
           <li class="nav-item"><a class="nav-link" href="manage-links.html"><i class="bi bi-pencil-square"></i> Manage Links</a></li>
+          <li class="nav-item"><a class="nav-link" href="manage-subcategories.html"><i class="bi bi-tags"></i> Subcategories</a></li>
         </ul>
       </div>
     </div>
@@ -46,6 +49,7 @@
         <a href="#cat-powerbi" class="kb-cat-pill"><i class="bi bi-bar-chart-fill"></i> Power BI</a>
         <a href="#cat-sharepoint" class="kb-cat-pill"><i class="bi bi-diamond-fill"></i> SharePoint</a>
         <a href="#cat-other" class="kb-cat-pill"><i class="bi bi-circle"></i> Other</a>
+        <a href="#prompts-section" class="kb-cat-pill" style="background:rgba(22,163,74,0.2);border-color:rgba(22,163,74,0.4);"><i class="bi bi-chat-square-text"></i> Prompts</a>
         <a href="#links-section" class="kb-cat-pill kb-cat-pill-links"><i class="bi bi-link-45deg"></i> Links</a>
       </div>
     </div>
@@ -66,6 +70,15 @@
 
         <!-- Category Sections -->
         <div id="categorySections"></div>
+
+        <!-- Prompts Section -->
+        <div id="prompts-section" class="mt-4">
+          <div class="kb-links-header" style="border-bottom-color:#16a34a;">
+            <h4 class="kb-links-main-title"><i class="bi bi-chat-square-text" style="color:#16a34a;"></i> Prompts</h4>
+            <a href="new-prompt.html" class="btn kb-btn-primary btn-sm">+ New Prompt</a>
+          </div>
+          <div id="promptsSection"></div>
+        </div>
 
         <!-- Links Section -->
         <div id="links-section" class="mt-4">
@@ -137,7 +150,12 @@
       s2.src = 'links-data.js?v=' + Date.now();
       s2.onload = function() {
         const s3 = document.createElement('script');
-        s3.src = 'script.js?v=' + Date.now();
+        s3.src = 'prompts-data.js?v=' + Date.now();
+        s3.onload = function() {
+          const s4 = document.createElement('script');
+          s4.src = 'script.js?v=' + Date.now();
+          document.body.appendChild(s4);
+        };
         document.body.appendChild(s3);
       };
       document.body.appendChild(s2);

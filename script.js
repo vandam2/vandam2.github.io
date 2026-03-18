@@ -96,7 +96,9 @@ function buildSidebar() {
   catEl.innerHTML = CATS.map(cat => {
     const count = NOTES.filter(n => n.category === cat.id).length;
     return `<li><a href="#cat-${cat.id}"><span><i class="bi ${cat.icon} me-2" style="color:var(--accent)"></i>${cat.label}</span><span class="cat-badge">${count}</span></a></li>`;
-  }).join('') + `<li><a href="#links-section"><span><i class="bi bi-link-45deg me-2" style="color:var(--links)"></i>Links</span><span class="cat-badge" style="background:var(--links-lt);color:var(--links);border-color:rgba(8,145,178,0.2)">${typeof LINKS !== 'undefined' ? LINKS.length : 0}</span></a></li>`;
+  }).join('')
+  + `<li><a href="#prompts-section"><span><i class="bi bi-chat-square-text me-2" style="color:#16a34a"></i>Prompts</span><span class="cat-badge" style="background:#f0fdf4;color:#16a34a;border-color:#bbf7d0">${typeof PROMPTS !== 'undefined' ? PROMPTS.length : 0}</span></a></li>`
+  + `<li><a href="#links-section"><span><i class="bi bi-link-45deg me-2" style="color:var(--links)"></i>Links</span><span class="cat-badge" style="background:var(--links-lt);color:var(--links);border-color:rgba(8,145,178,0.2)">${typeof LINKS !== 'undefined' ? LINKS.length : 0}</span></a></li>`;
 
   // Sidebar links
   const sidebarLinksEl = document.getElementById('sidebarLinks');
@@ -188,7 +190,39 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ─── BUILD LINKS SECTION ─────────────────────
+// ─── BUILD PROMPTS SECTION ────────────────────
+function buildPromptsSection() {
+  const container = document.getElementById('promptsSection');
+  if (!container) return;
+  if (typeof PROMPTS === 'undefined' || PROMPTS.length === 0) {
+    container.innerHTML = `<div class="kb-links-empty"><i class="bi bi-chat-square-text fs-2 d-block mb-2 opacity-25"></i><p class="mb-1">No prompts yet</p><a href="new-prompt.html" class="btn kb-btn-primary btn-sm mt-1">+ Add First Prompt</a></div>`;
+    return;
+  }
+
+  const sorted = [...PROMPTS].sort((a,b) => new Date(b.date) - new Date(a.date));
+  container.innerHTML = `<div class="kb-note-list">` +
+    sorted.map(p => `
+      <a href="prompt-viewer.html?prompt=${p.id}" class="kb-note-item">
+        <div class="kb-note-left">
+          <div class="kb-note-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-chat-square-text"></i></div>
+          <div>
+            <div class="kb-note-title">${p.title}</div>
+            <div class="kb-note-subcat">${p.categoryLabel || p.category}</div>
+          </div>
+        </div>
+        <div class="kb-note-right">
+          <span class="kb-note-date">${p.date ? new Date(p.date).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : ''}</span>
+          <i class="bi bi-chevron-right kb-note-arrow"></i>
+        </div>
+      </a>`).join('') +
+    `</div>`;
+}
+
+// ─── INIT ─────────────────────────────────────
+buildCategorySections();
+buildSidebar();
+buildPromptsSection();
+buildLinksSection();
 const LINK_CATS = [
   { id: 'powerapps',     label: 'Power Apps',     icon: 'bi-lightning-charge-fill' },
   { id: 'powerautomate', label: 'Power Automate', icon: 'bi-arrow-repeat' },
