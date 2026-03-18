@@ -1,8 +1,3 @@
-// ============================================
-// notes-data.js — Your note catalog
-// Add a new entry here for each note you create
-// ============================================
-
 const NOTES = [
   {
     id: "pa-gallery-delegation",
@@ -148,11 +143,6 @@ const NOTES = [
     date: "2025-01-03"
   }
 ];
-
-// ============================================
-// SUBCATEGORY DEFINITIONS PER CATEGORY
-// Edit these to add/remove subcategory options
-// ============================================
 
 const SUBCATEGORIES = {
   powerapps:     ["Components", "Data & Formulas", "Forms", "Galleries", "Navigation", "Performance", "YAML", "Other"],
