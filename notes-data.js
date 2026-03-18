@@ -77,17 +77,6 @@ const NOTES = [
     date: "2025-01-02"
   },
   {
-    id: "flow-approval",
-    title: "Approval Flows — Multi-Stage & Escalation",
-    category: "powerautomate",
-    categoryLabel: "Power Automate",
-    subcategory: "Approvals",
-    excerpt: "Setting up sequential and parallel approval chains, adding timeouts with escalation paths, and storing outcomes back to SharePoint.",
-    tags: ["approvals", "workflow", "escalation"],
-    file: "notes/powerautomate/approval-flows.md",
-    date: "2024-12-20"
-  },
-  {
     id: "pbi-dax-calculate",
     title: "DAX CALCULATE — Context Modification Deep Dive",
     category: "powerbi",
