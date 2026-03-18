@@ -139,12 +139,14 @@
       localStorage.setItem('gh_token', v);
       document.getElementById('tokenInput').value = '';
       updateTokenStatus();
+      // Load note content now that we have a token
       if (window._note) loadNoteContent();
     }
     function updateTokenStatus() {
       const el = document.getElementById('tokenStatus');
-      if (getToken()) { el.textContent = '✓ Connected'; el.className = 'token-status set'; }
-      else { el.textContent = 'Not set'; el.className = 'token-status unset'; }
+      const has = !!getToken();
+      el.textContent = has ? '✓ Connected' : 'Not set';
+      el.className = has ? 'token-status set' : 'token-status unset';
     }
     updateTokenStatus();
 
@@ -169,7 +171,7 @@
     async function ghDelete(path, msg, sha) {
       const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
         method: 'DELETE',
-        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, sha, branch: GITHUB_BRANCH })
       });
       if (!r.ok) { const e = await r.json(); throw new Error(e.message || `Delete failed`); }
@@ -289,11 +291,21 @@
 
     // Init
     function init() {
-      const params = new URLSearchParams(window.location.search);
-      const note = NOTES.find(n => n.id === params.get('note'));
-      if (!note) { document.getElementById('pageTitle').textContent = 'Note not found'; return; }
-      window._note = note;
+      // Re-check token status on load
+      updateTokenStatus();
 
+      const params = new URLSearchParams(window.location.search);
+      const noteId = params.get('note');
+      const note = NOTES.find(n => n.id === noteId);
+
+      if (!note) {
+        document.getElementById('pageTitle').textContent = 'Note not found';
+        document.getElementById('loadingHint').textContent = `Could not find note with id: "${noteId}" in notes-data.js`;
+        document.getElementById('loadingHint').style.color = '#ef4444';
+        return;
+      }
+
+      window._note = note;
       document.title = `Edit: ${note.title} — NoteBase`;
       document.getElementById('pageTitle').textContent = note.title;
       document.getElementById('noteTitle').value   = note.title;
@@ -303,12 +315,18 @@
       document.getElementById('backLink').href     = `viewer.html?note=${note.id}`;
       document.getElementById('cancelLink').href   = `viewer.html?note=${note.id}`;
 
+      // Set category then subcategory
       const catSel = document.getElementById('noteCategory');
       for (let o of catSel.options) { if (o.value === note.category) { o.selected = true; break; } }
       updateSubcategories(note.subcategory);
 
-      if (getToken()) loadNoteContent();
-      else document.getElementById('loadingHint').textContent = '→ Set your GitHub token above to load content.';
+      // Load content if token already saved
+      if (getToken()) {
+        loadNoteContent();
+      } else {
+        document.getElementById('loadingHint').textContent = '→ Set your GitHub token above to load note content.';
+        document.getElementById('loadingHint').style.color = 'var(--text-muted)';
+      }
     }
 
     const _s = document.createElement('script');
