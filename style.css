@@ -71,7 +71,7 @@ body {
   max-width: 620px;
 }
 .kb-search-input {
-  padding: 14px 20px 14px 58px !important;
+  padding: 14px 24px !important;
   border-radius: 50px !important;
   border: none !important;
   font-size: 15px !important;

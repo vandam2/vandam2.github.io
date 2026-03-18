@@ -113,6 +113,7 @@ function buildSidebar() {
 
   // Tags
   const tagMap = {};
+  NOTES.forEach(n => n.tags.forEach(t => { tagMap[t] = (tagMap[t] || 0) + 1; }));
   const sortedTags = Object.entries(tagMap).sort((a, b) => b[1] - a[1]).slice(0, 20);
   const tagsEl = document.getElementById('popularTags');
   if (sortedTags.length === 0) {
