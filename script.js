@@ -98,8 +98,18 @@ function buildSidebar() {
     return `<li><a href="#cat-${cat.id}"><span><i class="bi ${cat.icon} me-2" style="color:var(--accent)"></i>${cat.label}</span><span class="cat-badge">${count}</span></a></li>`;
   }).join('') + `<li><a href="#links-section"><span><i class="bi bi-link-45deg me-2" style="color:var(--links)"></i>Links</span><span class="cat-badge" style="background:var(--links-lt);color:var(--links);border-color:rgba(8,145,178,0.2)">${typeof LINKS !== 'undefined' ? LINKS.length : 0}</span></a></li>`;
 
-  // Tags
-  const tagMap = {};
+  // Sidebar links
+  const sidebarLinksEl = document.getElementById('sidebarLinks');
+  if (sidebarLinksEl) {
+    if (typeof LINKS === 'undefined' || LINKS.length === 0) {
+      sidebarLinksEl.innerHTML = '<li class="text-muted small py-1">No links yet — <a href="new-link.html">add one</a></li>';
+    } else {
+      sidebarLinksEl.innerHTML = LINKS
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map(l => `<li><a href="${l.url}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i>${l.title}</a></li>`)
+        .join('');
+    }
+  }
   NOTES.forEach(n => n.tags.forEach(t => { tagMap[t] = (tagMap[t] || 0) + 1; }));
   const sortedTags = Object.entries(tagMap).sort((a, b) => b[1] - a[1]).slice(0, 20);
   const tagsEl = document.getElementById('popularTags');
