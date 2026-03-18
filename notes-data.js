@@ -99,17 +99,6 @@ const NOTES = [
     date: "2024-12-15"
   },
   {
-    id: "sp-list-columns",
-    title: "SharePoint List Column Types & When to Use Each",
-    category: "sharepoint",
-    categoryLabel: "SharePoint",
-    subcategory: "Lists",
-    excerpt: "Cheat sheet for choosing between Choice, Managed Metadata, Lookup, and Person columns. Covers indexing for large lists and threshold limits.",
-    tags: ["lists", "columns", "schema"],
-    file: "notes/sharepoint/list-columns.md",
-    date: "2024-12-18"
-  },
-  {
     id: "sp-permissions",
     title: "Permissions Architecture — Breaking Inheritance",
     category: "sharepoint",
