@@ -4,6 +4,15 @@
 
 const LINKS = [
   {
+    id: "christine-payton-83121",
+    title: "Christine Payton",
+    url: "https://www.youtube.com/@bi-ome/videos",
+    description: "YouTube Link",
+    category: "powerbi",
+    subcategory: "Other",
+    date: "2026-03-18"
+  },
+  {
     id: "shane-young-20947",
     title: "Shane Young",
     url: "https://www.youtube.com/@ShanesCows/videos",
