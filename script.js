@@ -175,6 +175,67 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// ─── BUILD LINKS SECTION ─────────────────────
+const LINK_CATS = [
+  { id: 'powerapps',     label: 'Power Apps',     icon: 'bi-lightning-charge-fill' },
+  { id: 'powerautomate', label: 'Power Automate', icon: 'bi-arrow-repeat' },
+  { id: 'powerbi',       label: 'Power BI',       icon: 'bi-bar-chart-fill' },
+  { id: 'sharepoint',    label: 'SharePoint',     icon: 'bi-diamond-fill' },
+  { id: 'm365',          label: 'Microsoft 365',  icon: 'bi-microsoft' },
+  { id: 'other',         label: 'Other',          icon: 'bi-circle' }
+];
+
+function buildLinksSection() {
+  const container = document.getElementById('linksSection');
+  if (!container || typeof LINKS === 'undefined' || LINKS.length === 0) {
+    if (container) container.innerHTML = `
+      <div class="kb-links-empty">
+        <i class="bi bi-link-45deg fs-2 d-block mb-2 opacity-25"></i>
+        <p class="mb-1 fw-600">No links yet</p>
+        <a href="new-link.html" class="btn kb-btn-primary btn-sm mt-1">+ Add First Link</a>
+      </div>`;
+    return;
+  }
+
+  // Group by category
+  const groups = {};
+  LINK_CATS.forEach(cat => {
+    const catLinks = LINKS.filter(l => l.category === cat.id);
+    if (catLinks.length > 0) groups[cat.id] = { ...cat, links: catLinks };
+  });
+
+  if (Object.keys(groups).length === 0) {
+    container.innerHTML = `<div class="kb-links-empty"><i class="bi bi-link-45deg fs-2 d-block mb-2 opacity-25"></i><p>No links yet. <a href="new-link.html">Add one!</a></p></div>`;
+    return;
+  }
+
+  container.innerHTML = Object.values(groups).map(cat => `
+    <div class="kb-links-cat mb-4">
+      <h6 class="kb-links-cat-title">
+        <i class="bi ${cat.icon} me-2"></i>${cat.label}
+        <span class="kb-links-count">${cat.links.length}</span>
+      </h6>
+      <div class="kb-links-grid">
+        ${cat.links.map(link => `
+          <a href="${link.url}" target="_blank" rel="noopener" class="kb-link-card">
+            <div class="kb-link-card-top">
+              <div class="kb-link-favicon">
+                <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(link.url)}&sz=32" 
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" 
+                     alt="" width="16" height="16"/>
+                <span class="kb-link-icon-fallback" style="display:none"><i class="bi bi-link-45deg"></i></span>
+              </div>
+              <span class="kb-link-external"><i class="bi bi-box-arrow-up-right"></i></span>
+            </div>
+            <div class="kb-link-title">${link.title}</div>
+            <div class="kb-link-desc">${link.description || ''}</div>
+            ${link.subcategory ? `<div class="kb-link-subcat">${link.subcategory}</div>` : ''}
+          </a>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
 // ─── INIT ─────────────────────────────────────
 buildCategorySections();
 buildSidebar();
+buildLinksSection();

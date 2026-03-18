@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Link — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
+    </div>
+  </nav>
+  <div class="kb-breadcrumb">
+    <div class="container">
+      <a href="index.html">Home</a><span class="sep">/</span><span class="text-muted">Add Link</span>
+    </div>
+  </div>
+
+  <div class="container kb-main">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="kb-form-card">
+          <div class="d-flex align-items-center gap-3 mb-1">
+            <div style="width:44px;height:44px;background:var(--links-lt);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--links);font-size:22px;">
+              <i class="bi bi-link-45deg"></i>
+            </div>
+            <div>
+              <h3 class="mb-0" style="font-family:'Nunito',sans-serif;font-weight:800;">Add a Link</h3>
+              <p class="text-muted small mb-0">Save a useful resource to your knowledge base</p>
+            </div>
+          </div>
+          <hr class="my-4"/>
+
+          <!-- Token -->
+          <div class="kb-token-box">
+            <div class="kb-token-label"><i class="bi bi-key me-1"></i>GitHub Connection</div>
+            <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected</span></div>
+            <div id="tokenNotSet">
+              <span class="token-not-set d-inline-block mb-2"><i class="bi bi-x-circle me-1"></i>Not set</span>
+              <div class="input-group">
+                <input type="password" class="form-control form-control-sm" id="tokenInput" placeholder="Paste GitHub Personal Access Token..."/>
+                <button class="btn btn-primary btn-sm" onclick="saveToken()">Save</button>
+              </div>
+              <div class="mt-1 small"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create token</a> with <strong>repo</strong> scope</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">URL *</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+              <input type="url" class="form-control" id="linkUrl" placeholder="https://..." oninput="fetchTitle()"/>
+            </div>
+            <div class="form-text">Paste the full URL — we'll try to detect the site name</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Title *</label>
+            <input type="text" class="form-control" id="linkTitle" placeholder="e.g. Power Apps Component Library"/>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" id="linkDesc" placeholder="What is this link useful for?"/>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Category *</label>
+              <select class="form-select" id="linkCategory" onchange="updateSubcategories()">
+                <option value="powerapps">Power Apps</option>
+                <option value="powerautomate">Power Automate</option>
+                <option value="powerbi">Power BI</option>
+                <option value="sharepoint">SharePoint</option>
+                <option value="m365">Microsoft 365</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Subcategory</label>
+              <select class="form-select" id="linkSubcategory"></select>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn kb-btn-primary" id="saveBtn" onclick="saveLink()">
+              <span id="saveBtnText"><i class="bi bi-cloud-upload me-1"></i>Save Link</span>
+            </button>
+            <a href="index.html" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+
+          <div class="kb-status" id="statusMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="kb-footer mt-5">
+    <div class="container text-center"><p class="mb-0 small">Vandam's Knowledge Base &copy; 2026</p></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
+
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function saveToken() {
+      const v = document.getElementById('tokenInput').value.trim();
+      if (!v) return;
+      localStorage.setItem('gh_token', v);
+      document.getElementById('tokenInput').value = '';
+      updateTokenUI();
+    }
+    function updateTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
+    }
+    updateTokenUI();
+
+    // Auto-fill title from URL
+    let titleFilled = false;
+    function fetchTitle() {
+      if (titleFilled) return;
+      const url = document.getElementById('linkUrl').value.trim();
+      if (!url) return;
+      try {
+        const hostname = new URL(url).hostname.replace('www.', '');
+        const titleEl = document.getElementById('linkTitle');
+        if (!titleEl.value) titleEl.value = hostname;
+      } catch(e) {}
+    }
+    document.getElementById('linkTitle').addEventListener('input', () => { titleFilled = true; });
+
+    const LINK_SUBCATEGORIES = {
+      powerapps:     ["Components", "Connectors", "Docs", "Tools", "Community", "Other"],
+      powerautomate: ["Connectors", "Docs", "Templates", "Tools", "Community", "Other"],
+      powerbi:       ["DAX Resources", "Docs", "Tools", "Visuals", "Community", "Other"],
+      sharepoint:    ["Admin", "Development", "Docs", "Tools", "Community", "Other"],
+      m365:          ["Admin", "Azure", "Docs", "Graph API", "Tools", "Other"],
+      other:         ["Learning", "Reference", "Tools", "Blogs", "Other"]
+    };
+
+    function updateSubcategories() {
+      const cat = document.getElementById('linkCategory').value;
+      const sub = document.getElementById('linkSubcategory');
+      sub.innerHTML = (LINK_SUBCATEGORIES[cat] || ['Other']).map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+    updateSubcategories();
+
+    function slugify(t) { return t.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').trim(); }
+
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
+      return r.json();
+    }
+    async function ghPut(path, content, msg, sha) {
+      const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'PUT failed'); }
+    }
+
+    function setStatus(type, msg) {
+      const el = document.getElementById('statusMsg');
+      el.className = `kb-status ${type}`;
+      el.innerHTML = type === 'saving' ? `<span class="spinner-border spinner-border-sm me-2"></span>${msg}` :
+                     type === 'success' ? `<i class="bi bi-check-circle me-2"></i>${msg}` : msg;
+    }
+
+    async function saveLink() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const url     = document.getElementById('linkUrl').value.trim();
+      const title   = document.getElementById('linkTitle').value.trim();
+      const desc    = document.getElementById('linkDesc').value.trim();
+      const cat     = document.getElementById('linkCategory').value;
+      const subcat  = document.getElementById('linkSubcategory').value;
+
+      if (!url || !title) { alert('Please fill in URL and Title.'); return; }
+      try { new URL(url); } catch(e) { alert('Please enter a valid URL including https://'); return; }
+
+      const id  = slugify(title) + '-' + Date.now().toString().slice(-5);
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      document.getElementById('saveBtnText').innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+      setStatus('saving', 'Saving link to GitHub...');
+
+      const newEntry = `  {\n    id: "${id}",\n    title: "${title.replace(/"/g,'\\"')}",\n    url: "${url}",\n    description: "${desc.replace(/"/g,'\\"')}",\n    category: "${cat}",\n    subcategory: "${subcat}",\n    date: "${new Date().toISOString().split('T')[0]}"\n  },`;
+
+      let attempts = 0;
+      while (attempts < 4) {
+        try {
+          await new Promise(r => setTimeout(r, 500));
+          const df = await ghGet('links-data.js');
+          const old = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
+          const updated = old.replace('const LINKS = [', `const LINKS = [\n${newEntry}`);
+          await ghPut('links-data.js', updated, `Add link: ${title}`, df.sha);
+          break;
+        } catch(e) {
+          attempts++;
+          if (attempts >= 4) {
+            setStatus('error', `<strong>Error:</strong> ${e.message}`);
+            btn.disabled = false;
+            document.getElementById('saveBtnText').innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save Link';
+            return;
+          }
+          setStatus('saving', `Retrying... (${attempts}/3)`);
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+
+      setStatus('success', `Link saved! Site updates in ~30 seconds. <a href="index.html" class="ms-2">← Go home</a>`);
+      btn.disabled = false;
+      document.getElementById('saveBtnText').innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save Link';
+      // Clear form
+      document.getElementById('linkUrl').value = '';
+      document.getElementById('linkTitle').value = '';
+      document.getElementById('linkDesc').value = '';
+      titleFilled = false;
+    }
+  </script>
+</body>
+</html>

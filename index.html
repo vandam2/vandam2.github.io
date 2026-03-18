@@ -23,7 +23,8 @@
       <div class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="index.html"><i class="bi bi-house"></i> Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="new-note.html"><i class="bi bi-plus-circle"></i> New Note</a></li>
+          <li class="nav-item"><a class="nav-link" href="new-note.html"><i class="bi bi-file-plus"></i> New Note</a></li>
+          <li class="nav-item"><a class="nav-link" href="new-link.html"><i class="bi bi-link-45deg"></i> Add Link</a></li>
         </ul>
       </div>
     </div>
@@ -44,6 +45,7 @@
         <a href="#cat-powerbi" class="kb-cat-pill"><i class="bi bi-bar-chart-fill"></i> Power BI</a>
         <a href="#cat-sharepoint" class="kb-cat-pill"><i class="bi bi-diamond-fill"></i> SharePoint</a>
         <a href="#cat-other" class="kb-cat-pill"><i class="bi bi-circle"></i> Other</a>
+        <a href="#links-section" class="kb-cat-pill kb-cat-pill-links"><i class="bi bi-link-45deg"></i> Links</a>
       </div>
     </div>
   </div>
@@ -63,6 +65,17 @@
 
         <!-- Category Sections -->
         <div id="categorySections"></div>
+
+        <!-- Links Section -->
+        <div id="links-section" class="mt-4">
+          <div class="kb-links-header">
+            <h4 class="kb-links-main-title">
+              <i class="bi bi-link-45deg"></i> Links
+            </h4>
+            <a href="new-link.html" class="btn kb-btn-primary btn-sm">+ Add Link</a>
+          </div>
+          <div id="linksSection"></div>
+        </div>
 
       </div>
 
@@ -111,7 +124,12 @@
     _s.src = 'notes-data.js?v=' + Date.now();
     _s.onload = function() {
       const s2 = document.createElement('script');
-      s2.src = 'script.js?v=' + Date.now();
+      s2.src = 'links-data.js?v=' + Date.now();
+      s2.onload = function() {
+        const s3 = document.createElement('script');
+        s3.src = 'script.js?v=' + Date.now();
+        document.body.appendChild(s3);
+      };
       document.body.appendChild(s2);
     };
     document.body.appendChild(_s);

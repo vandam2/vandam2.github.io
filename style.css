@@ -17,6 +17,8 @@
   --sp-lt:      #e0f5f5;
   --other:      #e87c3e;
   --other-lt:   #fff3ec;
+  --links:      #0891b2;
+  --links-lt:   #e0f7fa;
   --text:       #2d3748;
   --muted:      #718096;
   --border:     #e2e8f0;
@@ -125,6 +127,7 @@ body {
 .cat-bg-powerbi       { background: #e6a800; }
 .cat-bg-sharepoint    { background: var(--sp); }
 .cat-bg-other         { background: var(--other); }
+.cat-bg-links         { background: var(--links); }
 
 .kb-note-list {
   background: #fff;
@@ -156,6 +159,7 @@ body {
 .icon-powerbi       { background: var(--pbi-lt);   color: var(--pbi); }
 .icon-sharepoint    { background: var(--sp-lt);    color: var(--sp); }
 .icon-other         { background: var(--other-lt); color: var(--other); }
+.icon-links         { background: var(--links-lt); color: var(--links); }
 
 .kb-note-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; transition: color 0.15s; }
 .kb-note-subcat { font-size: 11px; color: var(--muted); }
@@ -264,6 +268,89 @@ body {
 .kb-btn-primary { background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; padding: 10px; transition: all 0.15s; }
 .kb-btn-primary:hover { background: var(--primary-dk); color: #fff; }
 
+/* ─── LINKS SECTION ───────────────────────── */
+.kb-cat-pill-links { background: rgba(8,145,178,0.25) !important; border-color: rgba(8,145,178,0.5) !important; }
+
+.kb-links-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--links);
+}
+.kb-links-main-title {
+  font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800;
+  color: var(--text); margin: 0;
+}
+.kb-links-main-title i { color: var(--links); margin-right: 8px; }
+
+.kb-links-cat-title {
+  font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.kb-links-count {
+  background: var(--links-lt); color: var(--links); border: 1px solid rgba(8,145,178,0.2);
+  padding: 1px 8px; border-radius: 50px; font-size: 11px; font-weight: 700;
+}
+
+.kb-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.kb-link-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.kb-link-card:hover {
+  border-color: var(--links);
+  box-shadow: 0 4px 16px rgba(8,145,178,0.12);
+  transform: translateY(-2px);
+  color: var(--text);
+}
+.kb-link-card-top {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+}
+.kb-link-favicon {
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+}
+.kb-link-favicon img { border-radius: 4px; }
+.kb-link-icon-fallback {
+  width: 24px; height: 24px; background: var(--links-lt); color: var(--links);
+  border-radius: 6px; align-items: center; justify-content: center; font-size: 13px;
+}
+.kb-link-external { color: #cbd5e0; font-size: 12px; transition: color 0.15s; }
+.kb-link-card:hover .kb-link-external { color: var(--links); }
+
+.kb-link-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  line-height: 1.3;
+}
+.kb-link-card:hover .kb-link-title { color: var(--links); }
+
+.kb-link-desc {
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.kb-link-subcat {
+  font-size: 11px; color: var(--links); background: var(--links-lt);
+  padding: 2px 8px; border-radius: 50px; display: inline-block; margin-top: 2px;
+  border: 1px solid rgba(8,145,178,0.2); font-weight: 600;
+}
+.kb-links-empty {
+  text-align: center; padding: 40px; color: var(--muted);
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+}
+
 /* ─── FOOTER ──────────────────────────────── */
 .kb-footer {
   background: var(--primary);
@@ -289,6 +376,7 @@ body {
 .kb-badge-powerbi       { background: var(--pbi-lt);   color: var(--pbi); }
 .kb-badge-sharepoint    { background: var(--sp-lt);    color: var(--sp); }
 .kb-badge-other         { background: var(--other-lt); color: var(--other); }
+.kb-badge-links         { background: var(--links-lt); color: var(--links); }
 
 .kb-article-title {
   font-family: 'Nunito', sans-serif;
