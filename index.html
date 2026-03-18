@@ -1,68 +1,111 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vandam's Knowledge Base</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <span class="logo-icon">⬡</span>
-      <span class="logo-text">NoteBase</span>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="index.html" class="nav-item active" data-filter="all"><span class="nav-icon">▦</span> All Notes</a>
-      <a href="#" class="nav-item" data-filter="powerapps"><span class="nav-icon">⚡</span> Power Apps</a>
-      <a href="#" class="nav-item" data-filter="powerautomate"><span class="nav-icon">↻</span> Power Automate</a>
-      <a href="#" class="nav-item" data-filter="powerbi"><span class="nav-icon">◈</span> Power BI</a>
-      <a href="#" class="nav-item" data-filter="sharepoint"><span class="nav-icon">◇</span> SharePoint</a>
-      <a href="#" class="nav-item" data-filter="other"><span class="nav-icon">○</span> Other</a>
-    </nav>
-    <div class="sidebar-footer">
-      <button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button>
-      <span class="note-count" id="totalCount">0 notes</span>
-    </div>
-  </aside>
 
-  <main class="main">
-    <header class="page-header">
-      <div class="header-top">
-        <div>
-          <p class="header-label">PERSONAL KNOWLEDGE BASE</p>
-          <h1 class="header-title">My Notes</h1>
+  <!-- TOP NAV -->
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html">
+        <i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="index.html"><i class="bi bi-house"></i> Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="new-note.html"><i class="bi bi-plus-circle"></i> New Note</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO / SEARCH -->
+  <div class="kb-hero">
+    <div class="container text-center">
+      <h1 class="kb-hero-title">How can we help you?</h1>
+      <p class="kb-hero-sub">Search through Power Platform notes and guides</p>
+      <div class="kb-search-wrap mx-auto">
+        <input type="text" id="searchInput" class="form-control kb-search-input" placeholder="Search notes, tags, categories..." autocomplete="off"/>
+        <i class="bi bi-search kb-search-icon"></i>
+      </div>
+      <div class="kb-hero-cats mt-4">
+        <a href="#cat-powerapps" class="kb-cat-pill"><i class="bi bi-lightning-charge-fill"></i> Power Apps</a>
+        <a href="#cat-powerautomate" class="kb-cat-pill"><i class="bi bi-arrow-repeat"></i> Power Automate</a>
+        <a href="#cat-powerbi" class="kb-cat-pill"><i class="bi bi-bar-chart-fill"></i> Power BI</a>
+        <a href="#cat-sharepoint" class="kb-cat-pill"><i class="bi bi-diamond-fill"></i> SharePoint</a>
+        <a href="#cat-other" class="kb-cat-pill"><i class="bi bi-circle"></i> Other</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container kb-main">
+    <div class="row">
+
+      <!-- LEFT: Category Sections -->
+      <div class="col-lg-8">
+
+        <!-- Search Results (hidden by default) -->
+        <div id="searchResults" style="display:none;">
+          <h5 class="kb-section-title mb-3"><i class="bi bi-search"></i> Search Results</h5>
+          <div id="searchResultsList"></div>
         </div>
-        <a href="new-note.html" class="btn-new">+ New Note</a>
-      </div>
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" class="search-input" placeholder="Search notes, categories, tags..." autocomplete="off"/>
-        <kbd class="search-kbd">⌘K</kbd>
-      </div>
-      <div class="category-tabs" id="categoryTabs">
-        <button class="tab active" data-filter="all">All</button>
-        <button class="tab" data-filter="powerapps">Power Apps</button>
-        <button class="tab" data-filter="powerautomate">Power Automate</button>
-        <button class="tab" data-filter="powerbi">Power BI</button>
-        <button class="tab" data-filter="sharepoint">SharePoint</button>
-        <button class="tab" data-filter="other">Other</button>
-      </div>
-    </header>
 
-    <section class="grid-section">
-      <div class="results-bar"><span id="resultCount">Loading...</span></div>
-      <div class="note-list" id="cardGrid"></div>
-      <div class="empty-state" id="emptyState" style="display:none;">
-        <div class="empty-icon">∅</div>
-        <p>No notes found</p>
-        <small>Try a different search or add your first note</small>
-      </div>
-    </section>
-  </main>
+        <!-- Category Sections -->
+        <div id="categorySections"></div>
 
+      </div>
+
+      <!-- RIGHT: Sidebar -->
+      <div class="col-lg-4">
+
+        <!-- Recent Notes -->
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-clock-history"></i> Recent Notes</h6>
+          <ul class="kb-sidebar-list" id="recentNotes"></ul>
+        </div>
+
+        <!-- Browse by Category -->
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-grid-3x3-gap"></i> Browse by Category</h6>
+          <ul class="kb-cat-list" id="catList"></ul>
+        </div>
+
+        <!-- Popular Tags -->
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-tags"></i> Popular Tags</h6>
+          <div class="kb-tags" id="popularTags"></div>
+        </div>
+
+        <!-- Need Help? -->
+        <div class="kb-sidebar-box kb-help-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-plus-circle"></i> Add a Note</h6>
+          <p class="small text-muted mb-3">Capture something new while it's fresh in your mind.</p>
+          <a href="new-note.html" class="btn kb-btn-primary w-100">+ New Note</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="kb-footer">
+    <div class="container text-center">
+      <p class="mb-0 small">Vandam's Knowledge Base &mdash; Power Platform Notes &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const _s = document.createElement('script');
     _s.src = 'notes-data.js?v=' + Date.now();

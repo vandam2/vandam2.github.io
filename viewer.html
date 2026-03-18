@@ -1,103 +1,130 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Note — NoteBase</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .viewer-actions { display: flex; gap: 10px; align-items: center; margin-left: auto; }
-    .btn-edit { background: var(--bg-3); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 18px; border-radius: 8px; font-family: 'Figtree',sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
-    .btn-edit:hover { background: var(--bg-2); color: var(--accent); border-color: var(--accent); }
-    .btn-del { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 8px 18px; border-radius: 8px; font-family: 'Figtree',sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
-    .btn-del:hover { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.08); }
-  </style>
+  <title>Note — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="sidebar-logo"><span class="logo-icon">⬡</span><span class="logo-text">NoteBase</span></div>
-    <nav class="sidebar-nav">
-      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
-      <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
-      <a href="index.html?cat=powerautomate" class="nav-item"><span class="nav-icon">↻</span> Power Automate</a>
-      <a href="index.html?cat=powerbi" class="nav-item"><span class="nav-icon">◈</span> Power BI</a>
-      <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
-      <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
-    </nav>
-    <div class="sidebar-footer"><button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button></div>
-  </aside>
 
-  <main class="main">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap;">
-      <a href="index.html" class="viewer-back" style="margin-bottom:0;">← Back</a>
-      <div class="viewer-actions">
-        <a id="editBtn" href="#" class="btn-edit">✎ Edit</a>
-        <button class="btn-del" onclick="openDeleteModal()">✕ Delete</button>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html">
+        <i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base
+      </a>
+      <div class="ms-auto d-flex gap-2">
+        <a href="new-note.html" class="btn btn-sm btn-light fw-600"><i class="bi bi-plus-circle me-1"></i>New Note</a>
       </div>
     </div>
+  </nav>
 
-    <div class="viewer-header">
-      <div class="viewer-meta">
-        <span class="card-category" id="viewerCategory">...</span>
-        <span id="viewerSubcat" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);"></span>
-        <span class="viewer-date" id="viewerDate"></span>
-      </div>
-      <h1 class="viewer-title" id="viewerTitle">Loading...</h1>
-      <div class="card-tags" id="viewerTags"></div>
+  <!-- BREADCRUMB -->
+  <div class="kb-breadcrumb">
+    <div class="container">
+      <a href="index.html">Home</a>
+      <span class="sep">/</span>
+      <span id="bcCat">...</span>
+      <span class="sep">/</span>
+      <span id="bcTitle" class="text-muted">Loading...</span>
     </div>
+  </div>
 
-    <article class="note-content" id="noteContent">
-      <p style="color:var(--text-muted)">Loading...</p>
-    </article>
-  </main>
+  <!-- MAIN -->
+  <div class="container kb-main">
+    <div class="row">
+      <div class="col-lg-8">
 
-  <!-- Delete Modal -->
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal">
-      <div class="modal-icon">🗑️</div>
-      <h2>Delete this note?</h2>
-      <p>Permanently removes the note from GitHub. Cannot be undone. Site updates in ~30 seconds.</p>
-      <div class="modal-token">
-        <span class="modal-token-label">GITHUB CONNECTION</span>
-        <div id="tokenConnected" style="display:none;"><span class="token-badge set">✓ Connected</span></div>
-        <div id="tokenNotSet">
-          <div class="modal-token-row">
-            <input type="password" id="modalTokenInput" placeholder="Paste GitHub Personal Access Token..." />
-            <button class="btn-save-token" onclick="saveModalToken()">Save</button>
+        <!-- Article Header -->
+        <div class="kb-article-header">
+          <div class="kb-article-meta">
+            <span class="kb-badge" id="viewerBadge">...</span>
+            <span id="viewerSubcat" class="text-muted small"></span>
+            <span id="viewerDate" class="text-muted small ms-auto"></span>
           </div>
-          <div style="margin-top:6px;">
-            <span class="token-badge unset">Not connected</span>
-            <span style="font-size:11px;color:var(--text-muted);margin-left:8px;"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank" style="color:var(--accent);">Create token</a> with repo scope</span>
+          <h1 class="kb-article-title" id="viewerTitle">Loading...</h1>
+          <div class="kb-article-tags" id="viewerTags"></div>
+        </div>
+
+        <!-- Article Body -->
+        <div class="kb-article-body" id="noteContent">
+          <div class="text-center py-4 text-muted">
+            <div class="spinner-border spinner-border-sm me-2"></div> Loading...
           </div>
         </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 mt-3 mb-4">
+          <a href="index.html" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+          <a href="#" id="editBtn" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil me-1"></i>Edit</a>
+          <button onclick="openDeleteModal()" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+        </div>
+
       </div>
-      <div class="delete-status" id="deleteStatus"></div>
-      <div class="modal-actions">
-        <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
-        <button class="btn-modal-delete" id="confirmDeleteBtn" onclick="confirmDelete()">
-          <span id="deleteBtnText">🗑 Yes, Delete</span>
-        </button>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-folder2-open"></i> In This Category</h6>
+          <ul class="kb-sidebar-list" id="catNotes"></ul>
+        </div>
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-clock-history"></i> Recent Notes</h6>
+          <ul class="kb-sidebar-list" id="recentNotes"></ul>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- FOOTER -->
+  <footer class="kb-footer">
+    <div class="container text-center">
+      <p class="mb-0 small">Vandam's Knowledge Base &mdash; Power Platform Notes &copy; 2026</p>
+    </div>
+  </footer>
+
+  <!-- Delete Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger"><i class="bi bi-trash me-2"></i>Delete Note?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>This permanently removes the note from GitHub. Cannot be undone. Site updates in ~30 seconds.</p>
+          <div class="kb-token-box">
+            <div class="kb-token-label">GitHub Connection</div>
+            <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected — ready to delete</span></div>
+            <div id="tokenNotSet">
+              <span class="token-not-set mb-2 d-inline-block"><i class="bi bi-x-circle me-1"></i>Not connected</span>
+              <div class="input-group mt-2">
+                <input type="password" class="form-control form-control-sm" id="modalTokenInput" placeholder="Paste GitHub token..."/>
+                <button class="btn btn-primary btn-sm" onclick="saveModalToken()">Save</button>
+              </div>
+              <div class="mt-1"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank" class="small">Create token</a> with repo scope</div>
+            </div>
+          </div>
+          <div class="kb-status" id="deleteStatus"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger btn-sm" id="confirmDeleteBtn" onclick="confirmDelete()">
+            <span id="deleteBtnText"><i class="bi bi-trash me-1"></i>Yes, Delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
 
-    // Theme
-    const saved = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
-    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '☾';
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
-    });
-
-    // Token
     function getToken() { return localStorage.getItem('gh_token') || ''; }
     function saveModalToken() {
       const v = document.getElementById('modalTokenInput').value.trim();
@@ -112,9 +139,8 @@
       document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
     }
 
-    // GitHub API
     async function ghGet(path) {
-      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&t=${Date.now()}`, {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
       });
       if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
@@ -126,95 +152,34 @@
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, sha, branch: GITHUB_BRANCH })
       });
-      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `Delete failed`); }
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Delete failed'); }
     }
     async function ghPut(path, content, msg, sha) {
       const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
       if (sha) body.sha = sha;
       const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
         method: 'PUT',
-        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `Update failed`); }
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Update failed'); }
     }
 
     function setDeleteStatus(type, msg) {
       const el = document.getElementById('deleteStatus');
-      el.className = `delete-status ${type}`;
-      el.innerHTML = type === 'saving' ? `<div class="spinner-blue"></div> ${msg}` : msg;
+      el.className = `kb-status ${type}`;
+      el.innerHTML = type === 'saving'
+        ? `<span class="spinner-border spinner-border-sm me-2"></span> ${msg}`
+        : msg;
     }
 
-    function initViewer() {
-      const params = new URLSearchParams(window.location.search);
-      const note = NOTES.find(n => n.id === params.get('note'));
-
-      if (!note) {
-        document.getElementById('viewerTitle').textContent = 'Note not found';
-        document.getElementById('noteContent').innerHTML = '<p>This note does not exist. <a href="index.html">Go back home.</a></p>';
-        return;
-      }
-
-      document.title = `${note.title} — NoteBase`;
-      document.getElementById('viewerTitle').textContent = note.title;
-      document.getElementById('viewerDate').textContent = new Date(note.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
-      if (note.subcategory) document.getElementById('viewerSubcat').textContent = '· ' + note.subcategory;
-
-      const catEl = document.getElementById('viewerCategory');
-      catEl.textContent = note.categoryLabel;
-      catEl.className = `card-category cat-${note.category}`;
-
-      document.getElementById('viewerTags').innerHTML = note.tags.map(t => `<span class="tag">${t}</span>`).join('');
-      document.getElementById('editBtn').href = `edit-note.html?note=${note.id}`;
-
-      // Store note on window for delete modal
-      window._currentNote = note;
-
-      // Load content — supports both HTML (rich text) and plain text
-      fetch(`${note.file}?t=${Date.now()}`)
-        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-        .then(content => {
-          const el = document.getElementById('noteContent');
-          // Detect if it's HTML content from rich text editor
-          if (content.trim().startsWith('<')) {
-            el.innerHTML = content;
-          } else {
-            // Plain text fallback — wrap in paragraphs
-            el.innerHTML = content.split('\n\n').map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
-          }
-          // Add copy buttons to code blocks
-          el.querySelectorAll('pre').forEach(pre => {
-            const wrap = document.createElement('div');
-            wrap.className = 'code-block-wrap';
-            pre.parentNode.insertBefore(wrap, pre);
-            wrap.appendChild(pre);
-            const btn = document.createElement('button');
-            btn.className = 'copy-code-btn';
-            btn.textContent = 'Copy';
-            btn.onclick = () => {
-              navigator.clipboard.writeText(pre.textContent);
-              btn.textContent = 'Copied!';
-              btn.classList.add('copied');
-              setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-            };
-            wrap.appendChild(btn);
-          });
-        })
-        .catch(() => {
-          document.getElementById('noteContent').innerHTML = `<p style="color:var(--text-muted)">Content not found. <a href="edit-note.html?note=${note.id}">Click Edit to add content.</a></p>`;
-        });
-    }
-
-    // Delete modal
     function openDeleteModal() {
       updateModalTokenUI();
-      document.getElementById('deleteStatus').className = 'delete-status';
+      document.getElementById('deleteStatus').className = 'kb-status';
       document.getElementById('confirmDeleteBtn').disabled = false;
-      document.getElementById('deleteBtnText').textContent = '🗑 Yes, Delete';
-      document.getElementById('deleteModal').classList.add('open');
+      document.getElementById('deleteBtnText').innerHTML = '<i class="bi bi-trash me-1"></i>Yes, Delete';
+      new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
-    function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); }
-    document.getElementById('deleteModal').addEventListener('click', e => { if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); });
 
     async function confirmDelete() {
       if (!getToken()) { alert('Please paste your GitHub token first.'); return; }
@@ -222,42 +187,95 @@
       if (!note) return;
       const btn = document.getElementById('confirmDeleteBtn');
       btn.disabled = true;
-      document.getElementById('deleteBtnText').innerHTML = '<div class="spinner-sm"></div> Deleting...';
+      document.getElementById('deleteBtnText').innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Deleting...';
       setDeleteStatus('saving', 'Deleting note file...');
       try {
-        try {
-          const mdFile = await ghGet(note.file);
-          await ghDelete(note.file, `Delete note: ${note.title}`, mdFile.sha);
-        } catch(e) { console.log('File skip:', e.message); }
-
+        try { const f = await ghGet(note.file); await ghDelete(note.file, `Delete: ${note.title}`, f.sha); } catch(e) {}
         setDeleteStatus('saving', 'Updating notes catalog...');
         await new Promise(r => setTimeout(r, 3000));
-
         let attempts = 0;
         while (attempts < 4) {
           try {
-            const dataFile = await ghGet('notes-data.js');
-            let js = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+            const df = await ghGet('notes-data.js');
+            let js = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
             js = js.replace(new RegExp(`\\s*\\{[^{}]*?id:\\s*"${note.id}"[^{}]*?\\}\\s*,?`, 's'), '');
-            await ghPut('notes-data.js', js, `Delete note: ${note.title}`, dataFile.sha);
+            await ghPut('notes-data.js', js, `Delete: ${note.title}`, df.sha);
             break;
-          } catch(e) {
-            attempts++;
-            if (attempts >= 4) throw e;
-            setDeleteStatus('saving', `Retrying... (${attempts}/3)`);
-            await new Promise(r => setTimeout(r, 2000));
-          }
+          } catch(e) { attempts++; if (attempts >= 4) throw e; await new Promise(r => setTimeout(r, 2000)); }
         }
         setDeleteStatus('success', '✅ Deleted! Redirecting...');
         setTimeout(() => { window.location.href = 'index.html'; }, 2500);
       } catch(err) {
         setDeleteStatus('error', `<strong>Error:</strong> ${err.message}`);
         btn.disabled = false;
-        document.getElementById('deleteBtnText').textContent = '🗑 Yes, Delete';
+        document.getElementById('deleteBtnText').innerHTML = '<i class="bi bi-trash me-1"></i>Yes, Delete';
       }
     }
 
-    // Load notes-data fresh then init
+    function initViewer() {
+      const params = new URLSearchParams(window.location.search);
+      const note = NOTES.find(n => n.id === params.get('note'));
+      if (!note) {
+        document.getElementById('viewerTitle').textContent = 'Note not found';
+        document.getElementById('noteContent').innerHTML = '<p>This note does not exist. <a href="index.html">Go home.</a></p>';
+        return;
+      }
+      window._currentNote = note;
+      document.title = `${note.title} — Knowledge Base`;
+
+      document.getElementById('bcCat').innerHTML = `<a href="index.html#cat-${note.category}">${note.categoryLabel}</a>`;
+      document.getElementById('bcTitle').textContent = note.title;
+
+      const badge = document.getElementById('viewerBadge');
+      badge.textContent = note.categoryLabel;
+      badge.className = `kb-badge kb-badge-${note.category}`;
+
+      if (note.subcategory) document.getElementById('viewerSubcat').textContent = `· ${note.subcategory}`;
+      document.getElementById('viewerDate').textContent = new Date(note.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('viewerTitle').textContent = note.title;
+      document.getElementById('viewerTags').innerHTML = note.tags.map(t => `<span class="kb-article-tag">${t}</span>`).join('');
+      document.getElementById('editBtn').href = `edit-note.html?note=${note.id}`;
+
+      // Sidebar - notes in same category
+      const catNotes = NOTES.filter(n => n.category === note.category && n.id !== note.id).slice(0, 6);
+      const catEl = document.getElementById('catNotes');
+      catEl.innerHTML = catNotes.length === 0
+        ? '<li class="text-muted small py-1">No other notes in this category</li>'
+        : catNotes.map(n => `<li><a href="viewer.html?note=${n.id}"><i class="bi bi-file-text"></i>${n.title}</a></li>`).join('');
+
+      // Recent
+      const recent = [...NOTES].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,6);
+      document.getElementById('recentNotes').innerHTML = recent.map(n =>
+        `<li><a href="viewer.html?note=${n.id}"><i class="bi bi-file-text"></i>${n.title}</a></li>`).join('');
+
+      // Load content
+      fetch(`${note.file}?t=${Date.now()}`)
+        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+        .then(content => {
+          const el = document.getElementById('noteContent');
+          el.innerHTML = content.trim().startsWith('<') ? content
+            : content.split('\n\n').map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+          // Add copy buttons to code blocks
+          el.querySelectorAll('pre').forEach(pre => {
+            const wrap = document.createElement('div');
+            wrap.className = 'code-wrap';
+            pre.parentNode.insertBefore(wrap, pre);
+            wrap.appendChild(pre);
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn'; btn.textContent = 'Copy';
+            btn.onclick = () => {
+              navigator.clipboard.writeText(pre.textContent);
+              btn.textContent = 'Copied!'; btn.classList.add('copied');
+              setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+            };
+            wrap.appendChild(btn);
+          });
+        })
+        .catch(() => {
+          document.getElementById('noteContent').innerHTML = `<p class="text-muted">Content not found at <code>${note.file}</code>. <a href="edit-note.html?note=${note.id}">Click Edit to add content.</a></p>`;
+        });
+    }
+
     const _s = document.createElement('script');
     _s.src = 'notes-data.js?v=' + Date.now();
     _s.onload = initViewer;

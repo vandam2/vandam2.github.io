@@ -1,151 +1,180 @@
 // ============================================
-// script.js — Search, filter, render (list style)
+// script.js — Bootstrap KB homepage
 // ============================================
 
-const cardGrid    = document.getElementById('cardGrid');
-const searchInput = document.getElementById('searchInput');
-const emptyState  = document.getElementById('emptyState');
-const resultCount = document.getElementById('resultCount');
-const totalCount  = document.getElementById('totalCount');
-const tabs        = document.querySelectorAll('.tab');
-const navItems    = document.querySelectorAll('.nav-item[data-filter]');
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon   = document.getElementById('themeIcon');
+const CATS = [
+  { id: 'powerapps',     label: 'Power Apps',     icon: 'bi-lightning-charge-fill' },
+  { id: 'powerautomate', label: 'Power Automate', icon: 'bi-arrow-repeat' },
+  { id: 'powerbi',       label: 'Power BI',       icon: 'bi-bar-chart-fill' },
+  { id: 'sharepoint',    label: 'SharePoint',     icon: 'bi-diamond-fill' },
+  { id: 'other',         label: 'Other',          icon: 'bi-circle' }
+];
 
-let currentFilter = 'all';
-let currentSearch = '';
-
-// ─── THEME ──────────────────────────────────
-const saved = localStorage.getItem('theme') || 'dark';
-document.documentElement.setAttribute('data-theme', saved);
-themeIcon.textContent = saved === 'dark' ? '☀' : '☾';
-
-themeToggle.addEventListener('click', () => {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeIcon.textContent = next === 'dark' ? '☀' : '☾';
-});
-
-// ─── HELPERS ────────────────────────────────
 function formatDate(d) {
   return d ? new Date(d).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 }
 
-function buildCard(note) {
-  const a = document.createElement('a');
-  a.className = `note-card cat-${note.category}`;
-  a.href = `viewer.html?note=${note.id}`;
-  const tagsHTML = note.tags.map(t => `<span class="tag">${t}</span>`).join('');
-  a.innerHTML = `
-    <div class="note-card-left">
-      <div class="card-top">
-        <span class="card-category">${note.categoryLabel}</span>
-        ${note.subcategory ? `<span class="card-subcat">· ${note.subcategory}</span>` : ''}
+function noteItemHTML(note) {
+  return `
+    <a href="viewer.html?note=${note.id}" class="kb-note-item">
+      <div class="kb-note-left">
+        <div class="kb-note-icon icon-${note.category}">
+          <i class="bi bi-file-text"></i>
+        </div>
+        <div>
+          <div class="kb-note-title">${note.title}</div>
+          ${note.subcategory ? `<div class="kb-note-subcat">${note.subcategory}</div>` : ''}
+        </div>
       </div>
-      <div class="card-title">${note.title}</div>
-      <div class="card-excerpt">${note.excerpt}</div>
-      <div class="card-tags">${tagsHTML}</div>
-    </div>
-    <div class="note-card-right">
-      <span class="card-date">${formatDate(note.date)}</span>
-      <span class="card-arrow">→</span>
-    </div>
-  `;
-  return a;
+      <div class="kb-note-right">
+        <span class="kb-note-date">${formatDate(note.date)}</span>
+        <i class="bi bi-chevron-right kb-note-arrow"></i>
+      </div>
+    </a>`;
 }
 
-// ─── RENDER ─────────────────────────────────
-function renderCards(notes) {
-  cardGrid.innerHTML = '';
+// ─── BUILD CATEGORY SECTIONS ─────────────────
+function buildCategorySections() {
+  const container = document.getElementById('categorySections');
+  container.innerHTML = '';
 
-  if (notes.length === 0) {
-    emptyState.style.display = 'block';
-    resultCount.textContent = '0 results';
+  CATS.forEach(cat => {
+    const notes = NOTES.filter(n => n.category === cat.id)
+                       .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const preview = notes.slice(0, 6);
+    const hasMore = notes.length > 6;
+
+    const section = document.createElement('div');
+    section.className = 'kb-cat-section';
+    section.id = `cat-${cat.id}`;
+
+    section.innerHTML = `
+      <div class="kb-cat-header cat-bg-${cat.id}">
+        <span><i class="bi ${cat.icon}"></i>${cat.label}</span>
+        <span class="kb-cat-count">${notes.length} note${notes.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="kb-note-list">
+        ${preview.length === 0
+          ? `<div class="kb-empty-cat"><i class="bi bi-journal-plus me-2"></i>No notes yet — <a href="new-note.html">add one</a>!</div>`
+          : preview.map(noteItemHTML).join('')
+        }
+        ${hasMore ? `<a href="#" class="kb-view-all" data-cat="${cat.id}" onclick="showAll(event, '${cat.id}')">View all ${notes.length} notes <i class="bi bi-chevron-down ms-1"></i></a>` : ''}
+      </div>`;
+
+    container.appendChild(section);
+  });
+}
+
+function showAll(e, catId) {
+  e.preventDefault();
+  const notes = NOTES.filter(n => n.category === catId)
+                     .sort((a, b) => new Date(b.date) - new Date(a.date));
+  const section = document.getElementById(`cat-${catId}`);
+  const list = section.querySelector('.kb-note-list');
+  list.innerHTML = notes.map(noteItemHTML).join('');
+}
+
+// ─── SIDEBAR ─────────────────────────────────
+function buildSidebar() {
+  // Recent notes
+  const recent = [...NOTES].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+  const recentEl = document.getElementById('recentNotes');
+  if (recent.length === 0) {
+    recentEl.innerHTML = '<li class="text-muted small py-2">No notes yet</li>';
+  } else {
+    recentEl.innerHTML = recent.map(n => `
+      <li>
+        <a href="viewer.html?note=${n.id}">
+          <i class="bi bi-file-text"></i>${n.title}
+        </a>
+      </li>`).join('');
+  }
+
+  // Category list
+  const catEl = document.getElementById('catList');
+  catEl.innerHTML = CATS.map(cat => {
+    const count = NOTES.filter(n => n.category === cat.id).length;
+    return `<li><a href="#cat-${cat.id}"><span><i class="bi ${cat.icon} me-2" style="color:var(--accent)"></i>${cat.label}</span><span class="cat-badge">${count}</span></a></li>`;
+  }).join('');
+
+  // Tags
+  const tagMap = {};
+  NOTES.forEach(n => n.tags.forEach(t => { tagMap[t] = (tagMap[t] || 0) + 1; }));
+  const sortedTags = Object.entries(tagMap).sort((a, b) => b[1] - a[1]).slice(0, 20);
+  const tagsEl = document.getElementById('popularTags');
+  if (sortedTags.length === 0) {
+    tagsEl.innerHTML = '<span class="text-muted small">No tags yet</span>';
+  } else {
+    tagsEl.innerHTML = sortedTags.map(([tag]) =>
+      `<span class="kb-tag" onclick="searchByTag('${tag}')">${tag}</span>`
+    ).join('');
+  }
+}
+
+function searchByTag(tag) {
+  document.getElementById('searchInput').value = tag;
+  doSearch(tag);
+}
+
+// ─── SEARCH ──────────────────────────────────
+function doSearch(q) {
+  const query = q.trim().toLowerCase();
+  const categorySections = document.getElementById('categorySections');
+  const searchResults = document.getElementById('searchResults');
+  const searchResultsList = document.getElementById('searchResultsList');
+
+  if (!query) {
+    categorySections.style.display = 'block';
+    searchResults.style.display = 'none';
     return;
   }
 
-  emptyState.style.display = 'none';
-  resultCount.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
+  categorySections.style.display = 'none';
+  searchResults.style.display = 'block';
 
-  const groupBySubcat = currentFilter !== 'all' && !currentSearch.trim();
+  const matches = NOTES.filter(n =>
+    n.title.toLowerCase().includes(query) ||
+    n.excerpt.toLowerCase().includes(query) ||
+    n.tags.some(t => t.toLowerCase().includes(query)) ||
+    n.categoryLabel.toLowerCase().includes(query) ||
+    (n.subcategory && n.subcategory.toLowerCase().includes(query))
+  ).sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  if (groupBySubcat) {
-    const groups = {};
-    notes.forEach(note => {
-      const sub = note.subcategory || 'General';
-      if (!groups[sub]) groups[sub] = [];
-      groups[sub].push(note);
-    });
-
-    Object.keys(groups).sort().forEach(subcat => {
-      const heading = document.createElement('div');
-      heading.className = 'subcat-heading';
-      heading.innerHTML = `<span class="subcat-label">${subcat}</span><span class="subcat-count">${groups[subcat].length}</span>`;
-      cardGrid.appendChild(heading);
-      groups[subcat].forEach(note => cardGrid.appendChild(buildCard(note)));
-    });
-  } else {
-    notes.sort((a, b) => new Date(b.date) - new Date(a.date));
-    notes.forEach(note => cardGrid.appendChild(buildCard(note)));
+  if (matches.length === 0) {
+    searchResultsList.innerHTML = `<div class="kb-no-results"><i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>No results for "<strong>${q}</strong>"</div>`;
+    return;
   }
+
+  searchResultsList.innerHTML = matches.map(n => `
+    <a href="viewer.html?note=${n.id}" class="kb-search-result">
+      <div class="kb-note-left">
+        <div class="kb-note-icon icon-${n.category}"><i class="bi bi-file-text"></i></div>
+        <div>
+          <div class="kb-note-title">${n.title}</div>
+          <div class="kb-search-result-excerpt">${n.excerpt}</div>
+        </div>
+      </div>
+      <div class="kb-note-right">
+        <span class="kb-badge kb-badge-${n.category}">${n.categoryLabel}</span>
+        <i class="bi bi-chevron-right kb-note-arrow"></i>
+      </div>
+    </a>`).join('');
 }
 
-// ─── FILTERS ────────────────────────────────
-function applyFilters() {
-  let filtered = [...NOTES];
-  if (currentFilter !== 'all') {
-    filtered = filtered.filter(n => n.category === currentFilter);
-  }
-  if (currentSearch.trim()) {
-    const q = currentSearch.toLowerCase();
-    filtered = filtered.filter(n =>
-      n.title.toLowerCase().includes(q) ||
-      n.excerpt.toLowerCase().includes(q) ||
-      n.tags.some(t => t.toLowerCase().includes(q)) ||
-      n.categoryLabel.toLowerCase().includes(q) ||
-      (n.subcategory && n.subcategory.toLowerCase().includes(q))
-    );
-  }
-  if (!currentSearch.trim()) filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  renderCards(filtered);
-}
-
-// ─── TABS ────────────────────────────────────
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentFilter = tab.dataset.filter;
-    syncNavHighlight();
-    applyFilters();
-  });
-});
-
-// ─── SIDEBAR NAV ────────────────────────────
-navItems.forEach(item => {
-  item.addEventListener('click', e => {
-    e.preventDefault();
-    currentFilter = item.dataset.filter;
-    navItems.forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.filter === currentFilter));
-    applyFilters();
-  });
-});
-
-function syncNavHighlight() {
-  navItems.forEach(i => i.classList.toggle('active', i.dataset.filter === currentFilter));
-}
-
-// ─── SEARCH ─────────────────────────────────
-searchInput.addEventListener('input', () => { currentSearch = searchInput.value; applyFilters(); });
+document.getElementById('searchInput').addEventListener('input', e => doSearch(e.target.value));
 
 document.addEventListener('keydown', e => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); searchInput.focus(); searchInput.select(); }
-  if (e.key === 'Escape') { searchInput.blur(); searchInput.value = ''; currentSearch = ''; applyFilters(); }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+  if (e.key === 'Escape') {
+    document.getElementById('searchInput').value = '';
+    doSearch('');
+  }
 });
 
-// ─── INIT ────────────────────────────────────
-totalCount.textContent = `${NOTES.length} notes`;
-applyFilters();
+// ─── INIT ─────────────────────────────────────
+buildCategorySections();
+buildSidebar();

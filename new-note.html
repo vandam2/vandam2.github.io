@@ -1,152 +1,141 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>New Note — NoteBase</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <title>New Note — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="sidebar-logo"><span class="logo-icon">⬡</span><span class="logo-text">NoteBase</span></div>
-    <nav class="sidebar-nav">
-      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span> All Notes</a>
-      <a href="index.html?cat=powerapps" class="nav-item"><span class="nav-icon">⚡</span> Power Apps</a>
-      <a href="index.html?cat=powerautomate" class="nav-item"><span class="nav-icon">↻</span> Power Automate</a>
-      <a href="index.html?cat=powerbi" class="nav-item"><span class="nav-icon">◈</span> Power BI</a>
-      <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
-      <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
-    </nav>
-    <div class="sidebar-footer"><button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button></div>
-  </aside>
-
-  <main class="main">
-    <a href="index.html" class="viewer-back">← Back to all notes</a>
-    <div class="page-header" style="margin-bottom:28px;">
-      <p class="header-label">CREATE A NOTE</p>
-      <h1 class="header-title">New Note</h1>
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
     </div>
-
-    <div class="form-section">
-      <!-- GitHub Token -->
-      <div class="token-box">
-        <div class="token-box-header">
-          <span class="token-box-title">🔑 GitHub Connection</span>
-          <span class="token-status unset" id="tokenStatus">Not set</span>
-        </div>
-        <div class="token-input-row">
-          <input type="password" class="form-input" id="tokenInput" placeholder="Paste your GitHub Personal Access Token..." />
-          <button class="btn-save btn-sm" onclick="saveToken()">Save</button>
-        </div>
-        <p class="token-hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create token</a> with <strong>repo</strong> scope — saved in your browser only.</p>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Note Title *</label>
-        <input type="text" class="form-input" id="noteTitle" placeholder="e.g. Hide Navbar on Power Apps" />
-      </div>
-
-      <div class="form-row-3">
-        <div class="form-group">
-          <label class="form-label">Category *</label>
-          <select class="form-select" id="noteCategory" onchange="updateSubcategories()">
-            <option value="powerapps" data-label="Power Apps">Power Apps</option>
-            <option value="powerautomate" data-label="Power Automate">Power Automate</option>
-            <option value="powerbi" data-label="Power BI">Power BI</option>
-            <option value="sharepoint" data-label="SharePoint">SharePoint</option>
-            <option value="other" data-label="Other">Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Subcategory</label>
-          <select class="form-select" id="noteSubcategory"></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Date</label>
-          <input type="date" class="form-input" id="noteDate" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Short Description *</label>
-        <input type="text" class="form-input" id="noteExcerpt" placeholder="One or two sentence summary shown on the card..." />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Tags (comma separated)</label>
-        <input type="text" class="form-input" id="noteTags" placeholder="e.g. gallery, delegation, performance" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Note Content *</label>
-        <div class="editor-wrap">
-          <div id="editor"></div>
-        </div>
-        <p class="form-hint">Rich text editor — bold, headings, code blocks, lists. Paste or drag images directly in.</p>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-save" id="saveBtn" onclick="saveNote()">
-          <span id="saveBtnText">⬆ Save to GitHub</span>
-        </button>
-        <a href="index.html" class="btn-secondary">Cancel</a>
-      </div>
-
-      <div class="status-msg" id="statusMsg"></div>
+  </nav>
+  <div class="kb-breadcrumb">
+    <div class="container">
+      <a href="index.html">Home</a><span class="sep">/</span><span class="text-muted">New Note</span>
     </div>
-  </main>
+  </div>
 
+  <div class="container kb-main">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="kb-form-card">
+          <h3 class="mb-1" style="font-family:'Nunito',sans-serif;font-weight:800;">New Note</h3>
+          <p class="text-muted small mb-4">Add a new note to your knowledge base</p>
+
+          <!-- Token -->
+          <div class="kb-token-box">
+            <div class="kb-token-label"><i class="bi bi-key me-1"></i>GitHub Connection</div>
+            <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected</span></div>
+            <div id="tokenNotSet">
+              <span class="token-not-set d-inline-block mb-2"><i class="bi bi-x-circle me-1"></i>Not set</span>
+              <div class="input-group">
+                <input type="password" class="form-control form-control-sm" id="tokenInput" placeholder="Paste GitHub Personal Access Token..."/>
+                <button class="btn btn-primary btn-sm" onclick="saveToken()">Save</button>
+              </div>
+              <div class="mt-1 small"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create token</a> with <strong>repo</strong> scope</div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <label class="form-label">Note Title *</label>
+              <input type="text" class="form-control" id="noteTitle" placeholder="e.g. Hide Navbar on Power Apps"/>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Category *</label>
+              <select class="form-select" id="noteCategory" onchange="updateSubcategories()">
+                <option value="powerapps" data-label="Power Apps">Power Apps</option>
+                <option value="powerautomate" data-label="Power Automate">Power Automate</option>
+                <option value="powerbi" data-label="Power BI">Power BI</option>
+                <option value="sharepoint" data-label="SharePoint">SharePoint</option>
+                <option value="other" data-label="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Subcategory</label>
+              <select class="form-select" id="noteSubcategory"></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" id="noteDate"/>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <label class="form-label">Short Description *</label>
+              <input type="text" class="form-control" id="noteExcerpt" placeholder="One or two sentence summary shown on the card..."/>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <label class="form-label">Tags (comma separated)</label>
+              <input type="text" class="form-control" id="noteTags" placeholder="e.g. gallery, delegation, performance"/>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Note Content *</label>
+            <div class="editor-wrap">
+              <div id="editor"></div>
+            </div>
+            <div class="form-text">Rich text editor — bold, headings, code blocks, lists. Paste or drag images directly in.</div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn kb-btn-primary" id="saveBtn" onclick="saveNote()">
+              <span id="saveBtnText"><i class="bi bi-cloud-upload me-1"></i>Save to GitHub</span>
+            </button>
+            <a href="index.html" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+
+          <div class="kb-status" id="statusMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="kb-footer mt-5">
+    <div class="container text-center"><p class="mb-0 small">Vandam's Knowledge Base &copy; 2026</p></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
   <script>
     const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
 
-    // Theme
-    const saved = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
-    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '☾';
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
-    });
-
-    // Quill editor
     const quill = new Quill('#editor', {
       theme: 'snow',
       placeholder: 'Write your note here... paste or drag images directly in!',
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          ['code-block', 'blockquote'],
-          ['link', 'image'],
-          ['clean']
-        ]
-      }
+      modules: { toolbar: [[{header:[1,2,3,false]}],['bold','italic','underline'],[{list:'ordered'},{list:'bullet'}],['code-block','blockquote'],['link','image'],['clean']] }
     });
 
-    // Token
     function getToken() { return localStorage.getItem('gh_token') || ''; }
     function saveToken() {
       const v = document.getElementById('tokenInput').value.trim();
       if (!v) return;
       localStorage.setItem('gh_token', v);
       document.getElementById('tokenInput').value = '';
-      updateTokenStatus();
+      updateTokenUI();
     }
-    function updateTokenStatus() {
-      const el = document.getElementById('tokenStatus');
-      if (getToken()) { el.textContent = '✓ Connected'; el.className = 'token-status set'; }
-      else { el.textContent = 'Not set'; el.className = 'token-status unset'; }
+    function updateTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
     }
-    updateTokenStatus();
+    updateTokenUI();
 
-    // Date & subcategories
     document.getElementById('noteDate').value = new Date().toISOString().split('T')[0];
 
     function updateSubcategories() {
@@ -157,7 +146,6 @@
 
     function slugify(t) { return t.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').trim(); }
 
-    // GitHub API
     async function ghGet(path) {
       const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
@@ -173,14 +161,14 @@
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `PUT failed`); }
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'PUT failed'); }
     }
 
     function setStatus(type, msg) {
       const el = document.getElementById('statusMsg');
-      el.className = `status-msg ${type}`;
-      el.innerHTML = type === 'saving' ? `<div class="spinner"></div> ${msg}` :
-                     type === 'success' ? `<span>✅</span> ${msg}` : msg;
+      el.className = `kb-status ${type}`;
+      el.innerHTML = type === 'saving' ? `<span class="spinner-border spinner-border-sm me-2"></span>${msg}` :
+                     type === 'success' ? `<i class="bi bi-check-circle me-2"></i>${msg}` : msg;
     }
 
     async function saveNote() {
@@ -193,17 +181,14 @@
       const tagsRaw = document.getElementById('noteTags').value.trim();
       const date    = document.getElementById('noteDate').value;
       const content = quill.root.innerHTML;
-
-      if (!title || !excerpt || quill.getText().trim().length < 2) {
-        alert('Please fill in Title, Description, and Content.'); return;
-      }
+      if (!title || !excerpt || quill.getText().trim().length < 2) { alert('Please fill in Title, Description, and Content.'); return; }
 
       const slug     = slugify(title);
       const filePath = `notes/${cat}/${slug}.html`;
       const tags     = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`) : ['"general"'];
-      const btn      = document.getElementById('saveBtn');
-      btn.disabled   = true;
-      document.getElementById('saveBtnText').textContent = 'Saving...';
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      document.getElementById('saveBtnText').innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
       setStatus('saving', 'Creating note file on GitHub...');
 
       try {
@@ -211,35 +196,28 @@
         setStatus('saving', 'Updating notes catalog...');
         await new Promise(r => setTimeout(r, 800));
 
+        const newEntry = `  {\n    id: "${slug}",\n    title: "${title}",\n    category: "${cat}",\n    categoryLabel: "${catLbl}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt.replace(/"/g,'\\"')}",\n    tags: [${tags.join(', ')}],\n    file: "${filePath}",\n    date: "${date}"\n  },`;
+
         let attempts = 0;
         while (attempts < 4) {
           try {
-            const dataFile = await ghGet('notes-data.js');
-            const oldContent = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
-            const newEntry = `  {\n    id: "${slug}",\n    title: "${title}",\n    category: "${cat}",\n    categoryLabel: "${catLbl}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt.replace(/"/g,'\\"')}",\n    tags: [${tags.join(', ')}],\n    file: "${filePath}",\n    date: "${date}"\n  },`;
-            const updated = oldContent.replace('const NOTES = [', `const NOTES = [\n${newEntry}`);
-            await ghPut('notes-data.js', updated, `Add note entry: ${title}`, dataFile.sha);
+            const df = await ghGet('notes-data.js');
+            const old = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
+            await ghPut('notes-data.js', old.replace('const NOTES = [', `const NOTES = [\n${newEntry}`), `Add: ${title}`, df.sha);
             break;
-          } catch(e) {
-            attempts++;
-            if (attempts >= 4) throw e;
-            setStatus('saving', `Retrying... (${attempts}/3)`);
-            await new Promise(r => setTimeout(r, 2000));
-          }
+          } catch(e) { attempts++; if (attempts >= 4) throw e; setStatus('saving', `Retrying... (${attempts}/3)`); await new Promise(r => setTimeout(r, 2000)); }
         }
 
-        setStatus('success', `Note saved! Site updates in ~30 seconds. <a href="index.html" style="color:var(--accent);margin-left:8px;">← Go home</a>`);
+        setStatus('success', `Note saved! Site updates in ~30 seconds. <a href="index.html" class="ms-2">← Go home</a>`);
         btn.disabled = false;
-        document.getElementById('saveBtnText').textContent = '⬆ Save to GitHub';
-
+        document.getElementById('saveBtnText').innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save to GitHub';
       } catch(err) {
         setStatus('error', `<strong>Error:</strong> ${err.message}`);
         btn.disabled = false;
-        document.getElementById('saveBtnText').textContent = '⬆ Save to GitHub';
+        document.getElementById('saveBtnText').innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save to GitHub';
       }
     }
 
-    // Load subcategories
     const _s = document.createElement('script');
     _s.src = 'notes-data.js?v=' + Date.now();
     _s.onload = updateSubcategories;
