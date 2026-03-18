@@ -54,25 +54,24 @@
 
     <section class="grid-section">
       <div class="results-bar"><span id="resultCount">Loading...</span></div>
-      <div class="card-grid" id="cardGrid"></div>
+      <div class="note-list" id="cardGrid"></div>
       <div class="empty-state" id="emptyState" style="display:none;">
         <div class="empty-icon">∅</div>
         <p>No notes found</p>
-        <small>Try a different search or category</small>
+        <small>Try a different search or add your first note</small>
       </div>
     </section>
   </main>
 
   <script>
-    // Load notes-data.js fresh every time — no caching
-    const s = document.createElement('script');
-    s.src = 'notes-data.js?v=' + Date.now();
-    s.onload = function() {
+    const _s = document.createElement('script');
+    _s.src = 'notes-data.js?v=' + Date.now();
+    _s.onload = function() {
       const s2 = document.createElement('script');
       s2.src = 'script.js?v=' + Date.now();
       document.body.appendChild(s2);
     };
-    document.body.appendChild(s);
+    document.body.appendChild(_s);
   </script>
 </body>
 </html>

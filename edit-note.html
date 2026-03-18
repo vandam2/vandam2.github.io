@@ -6,46 +6,8 @@
   <title>Edit Note — NoteBase</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <style>
-    .form-section { max-width:780px; }
-    .form-group { margin-bottom:24px; }
-    .form-label { display:block; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
-    .form-input,.form-select,.form-textarea { width:100%; background:var(--bg-2); border:1px solid var(--border); color:var(--text); padding:12px 16px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:15px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
-    .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
-    .form-select option { background:var(--bg-2); }
-    .form-textarea { font-family:'DM Mono',monospace; font-size:13px; line-height:1.7; resize:vertical; min-height:380px; }
-    .form-hint { font-size:12px; color:var(--text-muted); margin-top:6px; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
-    .token-box { background:var(--bg-2); border:1px solid var(--border); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
-    .token-box-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .token-box-title { font-family:'Calibri','Trebuchet MS','Segoe UI',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
-    .token-status { font-family:'DM Mono',monospace; font-size:11px; padding:3px 10px; border-radius:100px; }
-    .token-status.set { background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); }
-    .token-status.unset { background:rgba(239,68,68,0.12); color:#ef4444; border:1px solid rgba(239,68,68,0.25); }
-    .token-input-row { display:flex; gap:10px; }
-    .token-hint { font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.6; }
-    .token-hint a { color:var(--accent); }
-    .btn-save { background:var(--accent); color:#fff; border:none; padding:13px 32px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.15s; box-shadow:0 4px 16px rgba(79,142,247,0.3); display:inline-flex; align-items:center; gap:8px; }
-    .btn-save:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 22px rgba(79,142,247,0.45); }
-    .btn-save:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-    .btn-danger { background:transparent; color:#ef4444; border:1px solid rgba(239,68,68,0.4); padding:13px 20px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.15s; }
-    .btn-danger:hover { background:rgba(239,68,68,0.1); }
-    .btn-secondary { background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:13px 20px; border-radius:10px; font-family:'Figtree',sans-serif; font-size:14px; cursor:pointer; transition:all 0.15s; text-decoration:none; display:inline-block; }
-    .btn-secondary:hover { color:var(--text); }
-    .btn-sm { padding:8px 16px; font-size:13px; border-radius:8px; }
-    .form-actions { display:flex; gap:12px; align-items:center; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); flex-wrap:wrap; }
-    .status-msg { display:none; padding:14px 18px; border-radius:10px; font-size:14px; margin-top:20px; line-height:1.5; }
-    .status-msg.saving { display:flex; align-items:center; gap:10px; background:var(--accent-glow); border:1px solid rgba(79,142,247,0.2); color:var(--accent); }
-    .status-msg.success { display:flex; align-items:center; gap:10px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); color:#22c55e; }
-    .status-msg.error { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#ef4444; }
-    .spinner { width:16px; height:16px; border:2px solid rgba(79,142,247,0.3); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .loading-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; align-items:center; justify-content:center; flex-direction:column; gap:16px; color:var(--text); font-size:14px; }
-    .loading-overlay.show { display:flex; }
-    @media (max-width:700px) { .form-row,.form-row-3 { grid-template-columns:1fr; } }
-  </style>
 </head>
 <body>
   <aside class="sidebar">
@@ -58,15 +20,8 @@
       <a href="index.html?cat=sharepoint" class="nav-item"><span class="nav-icon">◇</span> SharePoint</a>
       <a href="index.html?cat=other" class="nav-item"><span class="nav-icon">○</span> Other</a>
     </nav>
-    <div class="sidebar-footer">
-      <button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button>
-    </div>
+    <div class="sidebar-footer"><button class="theme-toggle" id="themeToggle"><span id="themeIcon">☀</span></button></div>
   </aside>
-
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="spinner" style="width:32px;height:32px;border-width:3px;"></div>
-    <span id="loadingMsg">Loading note content from GitHub...</span>
-  </div>
 
   <main class="main">
     <a href="#" id="backLink" class="viewer-back">← Back to note</a>
@@ -86,9 +41,7 @@
           <input type="password" class="form-input" id="tokenInput" placeholder="Paste your GitHub Personal Access Token..." />
           <button class="btn-save btn-sm" onclick="saveToken()">Save</button>
         </div>
-        <p class="token-hint">
-          <a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create a token</a> with <strong>repo</strong> scope — saved locally in your browser only.
-        </p>
+        <p class="token-hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create token</a> with <strong>repo</strong> scope.</p>
       </div>
 
       <div class="form-group">
@@ -128,16 +81,18 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Note Content (Markdown) *</label>
-        <textarea class="form-textarea" id="noteContent"></textarea>
-        <p class="form-hint">Edit your note content directly. Changes save straight to GitHub.</p>
+        <label class="form-label">Note Content</label>
+        <div class="editor-wrap">
+          <div id="editor"></div>
+        </div>
+        <p class="form-hint" id="loadingHint" style="color:var(--accent)">⏳ Loading current content from GitHub...</p>
       </div>
 
       <div class="form-actions">
         <button class="btn-save" id="saveBtn" onclick="saveNote()">
           <span id="saveBtnText">⬆ Save Changes to GitHub</span>
         </button>
-        <button class="btn-danger" id="deleteBtn" onclick="deleteNote()">✕ Delete Note</button>
+        <button class="btn-danger" onclick="deleteNote()">✕ Delete Note</button>
         <a href="#" id="cancelLink" class="btn-secondary">Cancel</a>
       </div>
 
@@ -145,11 +100,9 @@
     </div>
   </main>
 
-  <script src="notes-data.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
   <script>
-    const GITHUB_USER = 'vandam2';
-    const GITHUB_REPO = 'vandam2.github.io';
-    const GITHUB_BRANCH = 'main';
+    const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
 
     // Theme
     const saved = localStorage.getItem('theme') || 'dark';
@@ -162,16 +115,32 @@
       document.getElementById('themeIcon').textContent = next === 'dark' ? '☀' : '☾';
     });
 
+    // Quill
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      placeholder: 'Your note content will load here...',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['code-block', 'blockquote'],
+          ['link', 'image'],
+          ['clean']
+        ]
+      }
+    });
+
     // Token
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
     function saveToken() {
-      const val = document.getElementById('tokenInput').value.trim();
-      if (!val) return;
-      localStorage.setItem('gh_token', val);
+      const v = document.getElementById('tokenInput').value.trim();
+      if (!v) return;
+      localStorage.setItem('gh_token', v);
       document.getElementById('tokenInput').value = '';
       updateTokenStatus();
-      if (note) loadNoteContent();
+      if (window._note) loadNoteContent();
     }
-    function getToken() { return localStorage.getItem('gh_token') || ''; }
     function updateTokenStatus() {
       const el = document.getElementById('tokenStatus');
       if (getToken()) { el.textContent = '✓ Connected'; el.className = 'token-status set'; }
@@ -181,48 +150,37 @@
 
     // GitHub API
     async function ghGet(path) {
-      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
       });
       if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
       return r.json();
     }
-    async function ghPut(path, content, message, sha) {
-      const body = { message, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+    async function ghPut(path, content, msg, sha) {
+      const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
       if (sha) body.sha = sha;
       const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
         method: 'PUT',
         headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `PUT failed: ${r.status}`); }
-      return r.json();
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `PUT failed`); }
     }
-    async function ghDelete(path, message, sha) {
+    async function ghDelete(path, msg, sha) {
       const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
         method: 'DELETE',
-        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, sha, branch: GITHUB_BRANCH })
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, sha, branch: GITHUB_BRANCH })
       });
-      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `DELETE failed: ${r.status}`); }
-      return r.json();
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || `Delete failed`); }
     }
 
     function setStatus(type, msg) {
       const el = document.getElementById('statusMsg');
       el.className = `status-msg ${type}`;
-      if (type === 'saving') el.innerHTML = `<div class="spinner"></div> ${msg}`;
-      else if (type === 'success') el.innerHTML = `<span>✅</span> ${msg}`;
-      else el.innerHTML = msg;
+      el.innerHTML = type === 'saving' ? `<div class="spinner"></div> ${msg}` :
+                     type === 'success' ? `<span>✅</span> ${msg}` : msg;
     }
-
-    function slugify(t) { return t.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').trim(); }
-
-    // Load note
-    const params = new URLSearchParams(window.location.search);
-    const noteId = params.get('note');
-    const note = NOTES.find(n => n.id === noteId);
-    let mdFileSha = null;
 
     function updateSubcategories(keepVal) {
       const cat = document.getElementById('noteCategory').value;
@@ -232,24 +190,110 @@
     }
 
     async function loadNoteContent() {
+      const note = window._note;
       if (!note || !getToken()) return;
-      const overlay = document.getElementById('loadingOverlay');
-      overlay.classList.add('show');
       try {
+        // Try to load from GitHub directly (always fresh)
         const f = await ghGet(note.file);
-        mdFileSha = f.sha;
         const content = decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
-        document.getElementById('noteContent').value = content;
+        window._fileSha = f.sha;
+        if (content.trim().startsWith('<')) {
+          quill.root.innerHTML = content;
+        } else {
+          quill.root.innerHTML = content.split('\n\n').map(p => `<p>${p}</p>`).join('');
+        }
+        document.getElementById('loadingHint').textContent = '✓ Content loaded from GitHub';
+        document.getElementById('loadingHint').style.color = '#22c55e';
       } catch(e) {
-        document.getElementById('noteContent').value = `# ${note.title}\n\n<!-- Could not load current content: ${e.message} -->\n<!-- Add your content here -->`;
-      } finally {
-        overlay.classList.remove('show');
+        document.getElementById('loadingHint').textContent = 'Could not load content — write fresh content above.';
+        document.getElementById('loadingHint').style.color = 'var(--text-muted)';
       }
     }
 
-    if (!note) {
-      document.getElementById('pageTitle').textContent = 'Note not found';
-    } else {
+    async function saveNote() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const note    = window._note;
+      const title   = document.getElementById('noteTitle').value.trim();
+      const cat     = document.getElementById('noteCategory').value;
+      const catLbl  = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
+      const subcat  = document.getElementById('noteSubcategory').value;
+      const excerpt = document.getElementById('noteExcerpt').value.trim();
+      const tagsRaw = document.getElementById('noteTags').value.trim();
+      const date    = document.getElementById('noteDate').value;
+      const content = quill.root.innerHTML;
+      if (!title || !excerpt) { alert('Please fill in Title and Description.'); return; }
+
+      const tags = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`) : ['"general"'];
+      const btn  = document.getElementById('saveBtn');
+      btn.disabled = true;
+      document.getElementById('saveBtnText').textContent = 'Saving...';
+      setStatus('saving', 'Updating note file...');
+
+      try {
+        // Update the content file
+        const fileData = await ghGet(note.file);
+        await ghPut(note.file, content, `Update note: ${title}`, fileData.sha);
+        setStatus('saving', 'Updating notes catalog...');
+        await new Promise(r => setTimeout(r, 800));
+
+        const newEntry = `  {\n    id: "${note.id}",\n    title: "${title}",\n    category: "${cat}",\n    categoryLabel: "${catLbl}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt.replace(/"/g,'\\"')}",\n    tags: [${tags.join(', ')}],\n    file: "${note.file}",\n    date: "${date}"\n  }`;
+
+        let attempts = 0;
+        while (attempts < 4) {
+          try {
+            const dataFile = await ghGet('notes-data.js');
+            let js = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+            const pat = new RegExp(`\\s*\\{[^{}]*?id:\\s*"${note.id}"[^{}]*?\\}\\s*,?`, 's');
+            js = js.replace(pat, `\n${newEntry},`);
+            await ghPut('notes-data.js', js, `Update note entry: ${title}`, dataFile.sha);
+            break;
+          } catch(e) {
+            attempts++;
+            if (attempts >= 4) throw e;
+            setStatus('saving', `Retrying... (${attempts}/3)`);
+            await new Promise(r => setTimeout(r, 2000));
+          }
+        }
+
+        setStatus('success', `Saved! <a href="viewer.html?note=${note.id}" style="color:var(--accent);margin-left:8px;">← View note</a>`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = '⬆ Save Changes to GitHub';
+
+      } catch(err) {
+        setStatus('error', `<strong>Error:</strong> ${err.message}`);
+        btn.disabled = false;
+        document.getElementById('saveBtnText').textContent = '⬆ Save Changes to GitHub';
+      }
+    }
+
+    async function deleteNote() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      if (!confirm(`Delete "${window._note?.title}"? Cannot be undone.`)) return;
+      setStatus('saving', 'Deleting note...');
+      try {
+        try {
+          const f = await ghGet(window._note.file);
+          await ghDelete(window._note.file, `Delete note: ${window._note.title}`, f.sha);
+        } catch(e) { console.log('file skip'); }
+        await new Promise(r => setTimeout(r, 3000));
+        const dataFile = await ghGet('notes-data.js');
+        let js = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
+        js = js.replace(new RegExp(`\\s*\\{[^{}]*?id:\\s*"${window._note.id}"[^{}]*?\\}\\s*,?`, 's'), '');
+        await ghPut('notes-data.js', js, `Delete note: ${window._note.title}`, dataFile.sha);
+        setStatus('success', '✅ Deleted! Redirecting...');
+        setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+      } catch(err) {
+        setStatus('error', `<strong>Error:</strong> ${err.message}`);
+      }
+    }
+
+    // Init
+    function init() {
+      const params = new URLSearchParams(window.location.search);
+      const note = NOTES.find(n => n.id === params.get('note'));
+      if (!note) { document.getElementById('pageTitle').textContent = 'Note not found'; return; }
+      window._note = note;
+
       document.title = `Edit: ${note.title} — NoteBase`;
       document.getElementById('pageTitle').textContent = note.title;
       document.getElementById('noteTitle').value   = note.title;
@@ -264,96 +308,13 @@
       updateSubcategories(note.subcategory);
 
       if (getToken()) loadNoteContent();
-      else document.getElementById('noteContent').value = `# ${note.title}\n\n<!-- Set your GitHub token above to auto-load content -->`;
+      else document.getElementById('loadingHint').textContent = '→ Set your GitHub token above to load content.';
     }
 
-    async function saveNote() {
-      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
-      const title   = document.getElementById('noteTitle').value.trim();
-      const cat     = document.getElementById('noteCategory').value;
-      const catLbl  = document.getElementById('noteCategory').selectedOptions[0].dataset.label;
-      const subcat  = document.getElementById('noteSubcategory').value;
-      const excerpt = document.getElementById('noteExcerpt').value.trim();
-      const tagsRaw = document.getElementById('noteTags').value.trim();
-      const date    = document.getElementById('noteDate').value;
-      const content = document.getElementById('noteContent').value.trim();
-      if (!title || !excerpt || !content) { alert('Please fill in Title, Description, and Content.'); return; }
-
-      const tags = tagsRaw ? tagsRaw.split(',').map(t => `"${t.trim()}"`) : ['"general"'];
-      const btn = document.getElementById('saveBtn');
-      btn.disabled = true;
-      document.getElementById('saveBtnText').textContent = 'Saving...';
-      setStatus('saving', 'Updating markdown file on GitHub...');
-
-      try {
-        // Update .md file
-        await ghPut(note.file, content, `Update note: ${title}`, mdFileSha);
-
-        setStatus('saving', 'Updating notes catalog...');
-
-        const newEntry = `  {\n    id: "${note.id}",\n    title: "${title}",\n    category: "${cat}",\n    categoryLabel: "${catLbl}",\n    subcategory: "${subcat}",\n    excerpt: "${excerpt.replace(/"/g,'\\"')}",\n    tags: [${tags.join(', ')}],\n    file: "${note.file}",\n    date: "${date}"\n  }`;
-
-        // Retry loop for SHA conflicts
-        let attempts = 0;
-        while (attempts < 3) {
-          try {
-            const dataFile = await ghGet('notes-data.js');
-            let jsContent = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
-            const idPattern = new RegExp(`\\s*\\{[^}]*?id:\\s*"${note.id}"[^}]*?\\}\\s*,?`, 's');
-            if (idPattern.test(jsContent)) {
-              jsContent = jsContent.replace(idPattern, `\n${newEntry},`);
-            }
-            await ghPut('notes-data.js', jsContent, `Update note entry: ${title}`, dataFile.sha);
-            break;
-          } catch(e) {
-            attempts++;
-            if (attempts >= 3) throw e;
-            setStatus('saving', `Retrying... (attempt ${attempts + 1})`);
-            await new Promise(r => setTimeout(r, 1500));
-          }
-        }
-
-        setStatus('success', `Changes saved! Your site will update in about 30 seconds. <a href="viewer.html?note=${note.id}" style="color:var(--accent);margin-left:8px;">← Back to note</a>`);
-        btn.disabled = false;
-        document.getElementById('saveBtnText').textContent = '⬆ Save Changes to GitHub';
-
-      } catch(err) {
-        setStatus('error', `<strong>Error:</strong> ${err.message}<br><small>Check your token has 'repo' scope.</small>`);
-        btn.disabled = false;
-        document.getElementById('saveBtnText').textContent = '⬆ Save Changes to GitHub';
-      }
-    }
-
-    async function deleteNote() {
-      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
-      if (!confirm(`Delete "${note.title}"? This cannot be undone.`)) return;
-
-      const btn = document.getElementById('deleteBtn');
-      btn.disabled = true;
-      setStatus('saving', 'Deleting note from GitHub...');
-
-      try {
-        // Delete .md file
-        const mdFile = await ghGet(note.file);
-        await ghDelete(note.file, `Delete note: ${note.title}`, mdFile.sha);
-
-        setStatus('saving', 'Removing from notes catalog...');
-
-        // Remove entry from notes-data.js
-        const dataFile = await ghGet('notes-data.js');
-        let jsContent = decodeURIComponent(escape(atob(dataFile.content.replace(/\n/g,''))));
-        const idPattern = new RegExp(`\\s*\\{[^}]*?id:\\s*"${note.id}"[^}]*?\\}\\s*,?`, 's');
-        jsContent = jsContent.replace(idPattern, '');
-        await ghPut('notes-data.js', jsContent, `Delete note: ${note.title}`, dataFile.sha);
-
-        setStatus('success', `Note deleted! Redirecting to homepage... <a href="index.html" style="color:var(--accent)">Go now</a>`);
-        setTimeout(() => { window.location.href = 'index.html'; }, 3000);
-
-      } catch(err) {
-        setStatus('error', `<strong>Error:</strong> ${err.message}`);
-        btn.disabled = false;
-      }
-    }
+    const _s = document.createElement('script');
+    _s.src = 'notes-data.js?v=' + Date.now();
+    _s.onload = init;
+    document.body.appendChild(_s);
   </script>
 </body>
 </html>
