@@ -66,17 +66,6 @@ const NOTES = [
     date: "2025-01-05"
   },
   {
-    id: "flow-error-handling",
-    title: "Error Handling & Run After Patterns",
-    category: "powerautomate",
-    categoryLabel: "Power Automate",
-    subcategory: "Flow Design",
-    excerpt: "Configure Run After to catch failures, timeouts, and skipped actions. Build parallel branches for error notifications without killing the main flow.",
-    tags: ["errors", "run-after", "resilience"],
-    file: "notes/powerautomate/error-handling.md",
-    date: "2025-01-02"
-  },
-  {
     id: "pbi-dax-calculate",
     title: "DAX CALCULATE — Context Modification Deep Dive",
     category: "powerbi",
