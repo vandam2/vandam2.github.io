@@ -87,15 +87,6 @@ body {
   font-size: 17px;
   pointer-events: none;
 }
-.kb-search-icon {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-size: 17px;
-  pointer-events: none;
-}
 .kb-hero-cats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .kb-cat-pill {
   background: rgba(255,255,255,0.18);
