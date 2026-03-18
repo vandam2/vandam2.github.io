@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "hide-navbar",
+    title: "Hide Navbar",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "Other",
+    excerpt: "URL Parameter to Hide Navbar",
+    tags: ["general"],
+    file: "notes/powerapps/hide-navbar.html",
+    date: "2026-03-18"
+  },
+  {
     id: "pa-gallery-delegation",
     title: "Gallery Delegation & the 500-Row Limit",
     category: "powerapps",
