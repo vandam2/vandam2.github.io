@@ -71,13 +71,22 @@ body {
   max-width: 620px;
 }
 .kb-search-input {
-  padding: 14px 20px 14px 52px !important;
+  padding: 14px 20px 14px 58px !important;
   border-radius: 50px !important;
   border: none !important;
   font-size: 15px !important;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
 }
 .kb-search-input:focus { box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important; outline: none !important; }
+.kb-search-icon {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 17px;
+  pointer-events: none;
+}
 .kb-search-icon {
   position: absolute;
   left: 18px;

@@ -91,12 +91,12 @@ function buildSidebar() {
       </li>`).join('');
   }
 
-  // Category list
+  // Category list — notes
   const catEl = document.getElementById('catList');
   catEl.innerHTML = CATS.map(cat => {
     const count = NOTES.filter(n => n.category === cat.id).length;
     return `<li><a href="#cat-${cat.id}"><span><i class="bi ${cat.icon} me-2" style="color:var(--accent)"></i>${cat.label}</span><span class="cat-badge">${count}</span></a></li>`;
-  }).join('');
+  }).join('') + `<li><a href="#links-section"><span><i class="bi bi-link-45deg me-2" style="color:var(--links)"></i>Links</span><span class="cat-badge" style="background:var(--links-lt);color:var(--links);border-color:rgba(8,145,178,0.2)">${typeof LINKS !== 'undefined' ? LINKS.length : 0}</span></a></li>`;
 
   // Tags
   const tagMap = {};
