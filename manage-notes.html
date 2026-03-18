@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Notes — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .note-row { background:#fff; border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:10px; transition:all 0.15s; }
+    .note-row:hover { border-color: #bee3f8; box-shadow: 0 2px 10px rgba(33,150,243,0.08); }
+    .note-row.editing { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(33,150,243,0.1); }
+    .note-title-display { font-weight:700; font-size:15px; color:var(--text); }
+    .note-excerpt-display { font-size:13px; color:var(--muted); margin-top:3px; }
+    .note-meta { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:6px; }
+    .note-badge { font-size:11px; font-weight:700; padding:2px 10px; border-radius:50px; }
+    .note-actions { display:flex; gap:6px; flex-shrink:0; }
+
+    .edit-form { display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+    .edit-form .form-label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    .edit-form .form-control, .edit-form .form-select { font-size:13px; padding:8px 12px; border-radius:8px; }
+
+    .save-indicator { font-size:12px; color:#1a7a4a; display:none; }
+    .save-indicator.show { display:inline-flex; align-items:center; gap:4px; }
+
+    .cat-powerapps     { background: #f0eeff; color: #7b61ff; }
+    .cat-powerautomate { background: #e3f2ff; color: #0078d4; }
+    .cat-powerbi       { background: #fff8e1; color: #e6a800; }
+    .cat-sharepoint    { background: #e0f5f5; color: #038387; }
+    .cat-other         { background: #fff3ec; color: #e87c3e; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
+      <div class="ms-auto d-flex gap-2">
+        <a href="new-note.html" class="btn btn-sm btn-light fw-bold"><i class="bi bi-plus-circle me-1"></i>New Note</a>
+      </div>
+    </div>
+  </nav>
+  <div class="kb-breadcrumb">
+    <div class="container">
+      <a href="index.html">Home</a><span class="sep">/</span><span class="text-muted">Manage Notes</span>
+    </div>
+  </div>
+
+  <div class="container kb-main">
+    <div class="row">
+      <div class="col-lg-9">
+
+        <!-- Token -->
+        <div class="kb-token-box mb-4">
+          <div class="kb-token-label"><i class="bi bi-key me-1"></i>GitHub Connection</div>
+          <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected — edits save directly to GitHub</span></div>
+          <div id="tokenNotSet">
+            <span class="token-not-set d-inline-block mb-2"><i class="bi bi-x-circle me-1"></i>Not set</span>
+            <div class="input-group" style="max-width:500px">
+              <input type="password" class="form-control form-control-sm" id="tokenInput" placeholder="Paste GitHub Personal Access Token..."/>
+              <button class="btn btn-primary btn-sm" onclick="saveToken()">Save</button>
+            </div>
+            <div class="mt-1 small"><a href="https://github.com/settings/tokens/new?scopes=repo&description=NoteBase" target="_blank">Create token</a> with <strong>repo</strong> scope</div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 style="font-family:'Nunito',sans-serif;font-weight:800;margin:0;">
+            <i class="bi bi-journal-text me-2" style="color:var(--accent)"></i>
+            Manage Notes <span class="text-muted fs-6 fw-normal" id="noteCount"></span>
+          </h4>
+          <a href="new-note.html" class="btn kb-btn-primary btn-sm">+ New Note</a>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="mb-3 d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm btn-outline-secondary active" onclick="filterCat('all',this)">All</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="filterCat('powerapps',this)">Power Apps</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="filterCat('powerautomate',this)">Power Automate</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="filterCat('powerbi',this)">Power BI</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="filterCat('sharepoint',this)">SharePoint</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="filterCat('other',this)">Other</button>
+        </div>
+
+        <div id="notesList"></div>
+        <div id="emptyMsg" class="text-center py-5 text-muted" style="display:none;">
+          <i class="bi bi-journal-plus fs-2 d-block mb-2 opacity-25"></i>
+          <p>No notes yet. <a href="new-note.html">Add your first one!</a></p>
+        </div>
+
+      </div>
+
+      <div class="col-lg-3">
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-info-circle"></i> How to Edit</h6>
+          <p class="small text-muted mb-2">Click <strong>Edit</strong> on any note to update its <strong>title, category, subcategory, description, and tags</strong> inline.</p>
+          <p class="small text-muted mb-2">To edit the <strong>note content</strong> (body text and images), click the <strong>Edit Content</strong> button which opens the full rich text editor.</p>
+          <p class="small text-muted mb-0">Changes go live in ~30 seconds.</p>
+        </div>
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-tags"></i> Subcategories</h6>
+          <p class="small text-muted mb-2">To add new subcategory options, edit the <code>SUBCATEGORIES</code> object in <code>notes-data.js</code> on GitHub.</p>
+          <a href="https://github.com/vandam2/vandam2.github.io/blob/main/notes-data.js" target="_blank" class="btn kb-btn-primary btn-sm w-100">Edit notes-data.js →</a>
+        </div>
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-link-45deg"></i> Manage Links</h6>
+          <a href="manage-links.html" class="btn btn-outline-secondary btn-sm w-100">Go to Manage Links →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="kb-footer mt-5">
+    <div class="container text-center"><p class="mb-0 small">Vandam's Knowledge Base &copy; 2026</p></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
+
+    const CAT_LABELS = {
+      powerapps: 'Power Apps', powerautomate: 'Power Automate',
+      powerbi: 'Power BI', sharepoint: 'SharePoint', other: 'Other'
+    };
+
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function saveToken() {
+      const v = document.getElementById('tokenInput').value.trim();
+      if (!v) return;
+      localStorage.setItem('gh_token', v);
+      document.getElementById('tokenInput').value = '';
+      updateTokenUI();
+    }
+    function updateTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
+    }
+    updateTokenUI();
+
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET failed: ${r.status}`);
+      return r.json();
+    }
+    async function ghPut(path, content, msg, sha) {
+      const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'PUT failed'); }
+    }
+    async function ghDelete(path, msg, sha) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'DELETE',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, sha, branch: GITHUB_BRANCH })
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Delete failed'); }
+    }
+
+    let currentFilter = 'all';
+
+    function filterCat(cat, btn) {
+      currentFilter = cat;
+      document.querySelectorAll('.btn-outline-secondary').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderNotes();
+    }
+
+    function renderNotes() {
+      const list  = document.getElementById('notesList');
+      const empty = document.getElementById('emptyMsg');
+      const filtered = currentFilter === 'all'
+        ? [...NOTES] : NOTES.filter(n => n.category === currentFilter);
+      filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+      document.getElementById('noteCount').textContent = `(${filtered.length})`;
+
+      if (filtered.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+
+      list.innerHTML = filtered.map(note => {
+        const idx = NOTES.indexOf(note);
+        const catOpts = Object.entries(CAT_LABELS)
+          .map(([v,l]) => `<option value="${v}"${v===note.category?' selected':''}>${l}</option>`).join('');
+        const subcatOpts = (SUBCATEGORIES[note.category] || ['Other'])
+          .map(s => `<option value="${s}"${s===note.subcategory?' selected':''}>${s}</option>`).join('');
+        const tagsStr = (note.tags || []).join(', ');
+
+        return `
+        <div class="note-row" id="nrow-${idx}">
+          <div class="d-flex align-items-start justify-content-between gap-3">
+            <div class="flex-grow-1 min-width-0">
+              <div class="note-title-display">${note.title}</div>
+              <div class="note-excerpt-display">${note.excerpt}</div>
+              <div class="note-meta">
+                <span class="note-badge cat-${note.category}">${CAT_LABELS[note.category]||note.category}</span>
+                ${note.subcategory ? `<span class="note-badge" style="background:#f0f4ff;color:#4a6fa5;">${note.subcategory}</span>` : ''}
+                ${(note.tags||[]).map(t=>`<span class="note-badge" style="background:#f7f9fc;color:#718096;">${t}</span>`).join('')}
+                <span class="text-muted" style="font-size:11px">${note.date||''}</span>
+              </div>
+            </div>
+            <div class="note-actions">
+              <a href="viewer.html?note=${note.id}" class="btn btn-outline-secondary btn-sm" title="View"><i class="bi bi-eye"></i></a>
+              <a href="edit-note.html?note=${note.id}" class="btn btn-outline-info btn-sm" title="Edit Content"><i class="bi bi-pencil-square"></i></a>
+              <button class="btn btn-outline-primary btn-sm" onclick="toggleNoteEdit(${idx})" title="Edit Details"><i class="bi bi-sliders"></i></button>
+              <button class="btn btn-outline-danger btn-sm" onclick="deleteNote(${idx})" title="Delete"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+
+          <!-- Inline edit form -->
+          <div class="edit-form" id="nedit-${idx}">
+            <div class="row g-2">
+              <div class="col-12">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-control" id="ne-title-${idx}" value="${note.title.replace(/"/g,'&quot;')}"/>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="ne-cat-${idx}" onchange="updateNoteSubcat(${idx})">${catOpts}</select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Subcategory</label>
+                <select class="form-select" id="ne-subcat-${idx}">${subcatOpts}</select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" id="ne-date-${idx}" value="${note.date||''}"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Short Description</label>
+                <input type="text" class="form-control" id="ne-excerpt-${idx}" value="${note.excerpt.replace(/"/g,'&quot;')}"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Tags (comma separated)</label>
+                <input type="text" class="form-control" id="ne-tags-${idx}" value="${tagsStr}"/>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 mt-3 flex-wrap">
+              <button class="btn kb-btn-primary btn-sm" onclick="saveNoteEdit(${idx})">
+                <span id="nsave-btn-${idx}"><i class="bi bi-cloud-upload me-1"></i>Save Changes</span>
+              </button>
+              <a href="edit-note.html?note=${note.id}" class="btn btn-outline-info btn-sm">
+                <i class="bi bi-pencil-square me-1"></i>Edit Content (Rich Text)
+              </a>
+              <button class="btn btn-outline-secondary btn-sm" onclick="toggleNoteEdit(${idx})">Cancel</button>
+              <span class="save-indicator" id="nsaved-${idx}"><i class="bi bi-check-circle-fill text-success"></i> Saved!</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function toggleNoteEdit(idx) {
+      const form = document.getElementById(`nedit-${idx}`);
+      const row  = document.getElementById(`nrow-${idx}`);
+      const open = form.style.display === 'block';
+      form.style.display = open ? 'none' : 'block';
+      row.classList.toggle('editing', !open);
+    }
+
+    function updateNoteSubcat(idx) {
+      const cat = document.getElementById(`ne-cat-${idx}`).value;
+      const sub = document.getElementById(`ne-subcat-${idx}`);
+      sub.innerHTML = (SUBCATEGORIES[cat] || ['Other']).map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    async function saveNoteEdit(idx) {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const title   = document.getElementById(`ne-title-${idx}`).value.trim();
+      const cat     = document.getElementById(`ne-cat-${idx}`).value;
+      const subcat  = document.getElementById(`ne-subcat-${idx}`).value;
+      const date    = document.getElementById(`ne-date-${idx}`).value;
+      const excerpt = document.getElementById(`ne-excerpt-${idx}`).value.trim();
+      const tagsRaw = document.getElementById(`ne-tags-${idx}`).value.trim();
+      if (!title || !excerpt) { alert('Title and Description are required.'); return; }
+
+      const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const catLabel = CAT_LABELS[cat] || cat;
+
+      const btnEl = document.getElementById(`nsave-btn-${idx}`);
+      btnEl.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+      // Update in memory
+      NOTES[idx] = { ...NOTES[idx], title, category: cat, categoryLabel: catLabel, subcategory: subcat, date, excerpt, tags };
+
+      let attempts = 0;
+      while (attempts < 4) {
+        try {
+          await new Promise(r => setTimeout(r, 500));
+          const df = await ghGet('notes-data.js');
+          const old = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
+          await ghPut('notes-data.js', rebuildNotesJs(old), `Update note: ${title}`, df.sha);
+          break;
+        } catch(e) {
+          attempts++;
+          if (attempts >= 4) { alert('Save failed: ' + e.message); btnEl.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save Changes'; return; }
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+
+      btnEl.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save Changes';
+      const savedEl = document.getElementById(`nsaved-${idx}`);
+      savedEl.classList.add('show');
+      setTimeout(() => { savedEl.classList.remove('show'); renderNotes(); }, 2000);
+    }
+
+    async function deleteNote(idx) {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const note = NOTES[idx];
+      if (!confirm(`Delete "${note.title}"? This also removes the note file. Cannot be undone.`)) return;
+
+      try {
+        const f = await ghGet(note.file);
+        await ghDelete(note.file, `Delete note: ${note.title}`, f.sha);
+      } catch(e) { /* file may not exist, continue */ }
+
+      NOTES.splice(idx, 1);
+
+      let attempts = 0;
+      while (attempts < 4) {
+        try {
+          await new Promise(r => setTimeout(r, 2000));
+          const df = await ghGet('notes-data.js');
+          const old = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
+          await ghPut('notes-data.js', rebuildNotesJs(old), `Delete note: ${note.title}`, df.sha);
+          break;
+        } catch(e) {
+          attempts++;
+          if (attempts >= 4) { alert('Catalog update failed: ' + e.message); return; }
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+      renderNotes();
+    }
+
+    function rebuildNotesJs(oldContent) {
+      // Preserve SUBCATEGORIES section
+      const subcatMatch = oldContent.match(/const SUBCATEGORIES\s*=\s*\{[\s\S]*?\};/);
+      const subcatSection = subcatMatch ? '\n\n' + subcatMatch[0] : '';
+
+      const entries = NOTES.map(n => {
+        const tags = (n.tags||[]).map(t=>`"${t}"`).join(', ');
+        return `  {\n    id: "${n.id}",\n    title: "${(n.title||'').replace(/"/g,'\\"')}",\n    category: "${n.category}",\n    categoryLabel: "${n.categoryLabel}",\n    subcategory: "${n.subcategory||''}",\n    excerpt: "${(n.excerpt||'').replace(/"/g,'\\"')}",\n    tags: [${tags}],\n    file: "${n.file}",\n    date: "${n.date||''}"\n  }`;
+      }).join(',\n');
+
+      return `// ============================================\n// notes-data.js — Your note catalog\n// ============================================\n\nconst NOTES = [\n${entries}\n];${subcatSection}\n`;
+    }
+
+    // Load notes-data.js fresh
+    const _s = document.createElement('script');
+    _s.src = 'notes-data.js?v=' + Date.now();
+    _s.onload = () => {
+      if (typeof NOTES === 'undefined' || NOTES.length === 0) {
+        document.getElementById('emptyMsg').style.display = 'block';
+        document.getElementById('noteCount').textContent = '(0)';
+      } else {
+        renderNotes();
+      }
+    };
+    document.body.appendChild(_s);
+  </script>
+</body>
+</html>
