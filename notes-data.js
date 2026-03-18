@@ -4,17 +4,6 @@ const NOTES = [
     title: "Hide Navbar",
     category: "powerapps",
     categoryLabel: "Power Apps",
-    subcategory: "Other",
-    excerpt: "URL Parameter to Hide Navbar",
-    tags: ["general"],
-    file: "notes/powerapps/hide-navbar.html",
-    date: "2026-03-18"
-  },
-  {
-    id: "hide-navbar",
-    title: "Hide Navbar",
-    category: "powerapps",
-    categoryLabel: "Power Apps",
     subcategory: "Prompts",
     excerpt: "Prompts for Power apps ",
     tags: ["Prompts"],
