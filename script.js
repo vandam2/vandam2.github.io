@@ -100,6 +100,19 @@ function buildSidebar() {
   + `<li><a href="#prompts-section"><span><i class="bi bi-chat-square-text me-2" style="color:#16a34a"></i>Prompts</span><span class="cat-badge" style="background:#f0fdf4;color:#16a34a;border-color:#bbf7d0">${typeof PROMPTS !== 'undefined' ? PROMPTS.length : 0}</span></a></li>`
   + `<li><a href="#links-section"><span><i class="bi bi-link-45deg me-2" style="color:var(--links)"></i>Links</span><span class="cat-badge" style="background:var(--links-lt);color:var(--links);border-color:rgba(8,145,178,0.2)">${typeof LINKS !== 'undefined' ? LINKS.length : 0}</span></a></li>`;
 
+  // Sidebar prompts
+  const sidebarPromptsEl = document.getElementById('sidebarPrompts');
+  if (sidebarPromptsEl) {
+    if (typeof PROMPTS === 'undefined' || PROMPTS.length === 0) {
+      sidebarPromptsEl.innerHTML = '<li class="text-muted small py-1">No prompts yet — <a href="new-prompt.html">add one</a></li>';
+    } else {
+      sidebarPromptsEl.innerHTML = [...PROMPTS]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map(p => `<li><a href="prompt-viewer.html?prompt=${p.id}"><i class="bi bi-chat-square-text"></i>${p.title}</a></li>`)
+        .join('');
+    }
+  }
+
   // Sidebar links
   const sidebarLinksEl = document.getElementById('sidebarLinks');
   if (sidebarLinksEl) {
