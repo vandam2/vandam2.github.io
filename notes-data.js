@@ -55,17 +55,6 @@ const NOTES = [
     date: "2025-01-12"
   },
   {
-    id: "flow-http-action",
-    title: "HTTP Action & SharePoint REST API Calls",
-    category: "powerautomate",
-    categoryLabel: "Power Automate",
-    subcategory: "HTTP & APIs",
-    excerpt: "Calling SharePoint's REST API from Power Automate with the HTTP action. Authentication, headers, OData queries, and parsing JSON responses.",
-    tags: ["http", "rest", "sharepoint", "json"],
-    file: "notes/powerautomate/http-sharepoint-rest.md",
-    date: "2025-01-05"
-  },
-  {
     id: "pbi-dax-calculate",
     title: "DAX CALCULATE — Context Modification Deep Dive",
     category: "powerbi",
