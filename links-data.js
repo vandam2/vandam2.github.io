@@ -4,6 +4,15 @@
 
 const LINKS = [
   {
+    id: "shane-young-20947",
+    title: "Shane Young",
+    url: "https://www.youtube.com/@ShanesCows/videos",
+    description: "Youtube Link",
+    category: "powerapps",
+    subcategory: "Other",
+    date: "2026-03-18"
+  },
+  {
     id: "the-powerapps-guy-77519",
     title: "The Powerapps guy",
     url: "https://www.youtube.com/@PowerAppsGuy/videos",
