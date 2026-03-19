@@ -22,17 +22,6 @@ const NOTES = [
     date: "2026-03-19"
   },
   {
-    id: "hide-navbar",
-    title: "Hide Navbar",
-    category: "powerapps",
-    categoryLabel: "Power Apps",
-    subcategory: "Prompts",
-    excerpt: "Prompts for Power apps ",
-    tags: ["Prompts"],
-    file: "notes/powerapps/hide-navbar.html",
-    date: "2026-03-18"
-  },
-  {
     id: "pa-gallery-delegation",
     title: "Gallery Delegation & the 500-Row Limit",
     category: "powerapps",
