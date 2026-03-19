@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "hide-navbar-parameter",
+    title: "Hide Navbar Parameter",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "Components",
+    excerpt: "Hide Navbar Parameter",
+    tags: ["URL Parameter"],
+    file: "notes/powerapps/hide-navbar-parameter.html",
+    date: "2026-03-19"
+  },
+  {
     id: "alignment-and-canter-positions",
     title: "Alignment and Canter Positions",
     category: "powerapps",
