@@ -1,0 +1,5 @@
+<p>Center x and y properties</p><pre class="ql-syntax" spellcheck="false">X = (Parent.Width - Self.Width) / 2
+Y = (Parent.Height - Self.Height) / 2
+</pre><p>If you only want it centered horizontally:</p><pre class="ql-syntax" spellcheck="false">X = (Parent.Width - Self.Width) / 2
+</pre><p>If you only want it centered vertically:</p><pre class="ql-syntax" spellcheck="false">Y = (Parent.Height - Self.Height) / 2
+</pre><p><code>Self.Width</code> and <code>Self.Height</code> are the control’s own size, so this places the control in the exact middle of its parent container.</p>
