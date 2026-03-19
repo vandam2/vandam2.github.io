@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "powerapps-themes",
+    title: "Powerapps Themes",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "Other",
+    excerpt: "Theme fill colors",
+    tags: ["Theme"],
+    file: "notes/powerapps/powerapps-themes.html",
+    date: "2026-03-19"
+  },
+  {
     id: "hide-navbar",
     title: "Hide Navbar",
     category: "powerapps",
