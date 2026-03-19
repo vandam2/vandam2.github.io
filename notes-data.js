@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "alignment-and-canter-positions",
+    title: "Alignment and Canter Positions",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "Other",
+    excerpt: "Alignment and Canter Positions",
+    tags: ["Alignment"],
+    file: "notes/powerapps/alignment-and-canter-positions.html",
+    date: "2026-03-19"
+  },
+  {
     id: "powerapps-themes",
     title: "Powerapps Themes",
     category: "powerapps",
