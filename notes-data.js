@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "modern-gallery-and-header",
+    title: "Modern Gallery and Header",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "YAML",
+    excerpt: "Container with Header and Gallery controls with a modern looking theme",
+    tags: ["Gallery Container"],
+    file: "notes/powerapps/modern-gallery-and-header.html",
+    date: "2026-03-22"
+  },
+  {
     id: "hide-navbar-parameter",
     title: "Hide Navbar Parameter",
     category: "powerapps",
