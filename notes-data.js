@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "modern-popup-with-embedded-gallery",
+    title: "Modern Popup with Embedded Gallery",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "YAML",
+    excerpt: "Example Yaml of a PopUp with a gallery that does a lookup to a different list",
+    tags: ["Yaml Popup Container"],
+    file: "notes/powerapps/modern-popup-with-embedded-gallery.html",
+    date: "2026-03-22"
+  },
+  {
     id: "modern-gallery-and-header",
     title: "Modern Gallery and Header",
     category: "powerapps",
