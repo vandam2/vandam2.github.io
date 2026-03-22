@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Categories — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .cat-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cat-card:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .cat-card.editing { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    .drag-handle { cursor: grab; color: #cbd5e0; font-size: 18px; flex-shrink: 0; }
+    .drag-handle:active { cursor: grabbing; }
+    .cat-icon-wrap {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 18px;
+    }
+    .cat-meta { flex: 1; min-width: 0; }
+    .cat-label-display { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; cursor: pointer; }
+    .cat-id-display { font-size: 11px; color: #94a3b8; font-family: monospace; }
+    .cat-label-input {
+      font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px;
+      border: 1px solid var(--accent); border-radius: 7px; padding: 3px 10px;
+      outline: none; width: 100%; max-width: 260px;
+    }
+    .cat-id-input {
+      font-size: 12px; font-family: monospace; color: #475569;
+      border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px;
+      width: 150px; margin-top: 4px;
+    }
+    .color-swatch {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid #e2e8f0;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .color-picker-wrap { position: relative; }
+    .color-dropdown {
+      position: absolute; right: 0; top: 36px; background: #fff;
+      border: 1px solid var(--border); border-radius: 10px; padding: 10px;
+      display: flex; flex-wrap: wrap; gap: 8px; width: 172px; z-index: 200;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .color-dot {
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent; transition: transform 0.1s, border-color 0.15s;
+    }
+    .color-dot:hover, .color-dot.active { transform: scale(1.2); border-color: #64748b; }
+    .icon-picker-wrap { position: relative; }
+    .icon-dropdown {
+      position: absolute; right: 0; top: 36px; background: #fff;
+      border: 1px solid var(--border); border-radius: 10px; padding: 10px;
+      display: flex; flex-wrap: wrap; gap: 6px; width: 220px; z-index: 200;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto;
+    }
+    .icon-opt {
+      width: 34px; height: 34px; border-radius: 7px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; border: 1.5px solid transparent;
+      font-size: 16px; transition: background 0.15s, border-color 0.15s;
+    }
+    .icon-opt:hover, .icon-opt.active { background: var(--bg); border-color: var(--accent); }
+    .cat-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .edit-btn, .del-btn, .confirm-btn, .cancel-btn {
+      border: none; background: none; border-radius: 7px; padding: 5px 9px;
+      cursor: pointer; font-size: 14px; transition: background 0.15s;
+    }
+    .edit-btn { color: #64748b; } .edit-btn:hover { background: #f1f5f9; color: var(--accent); }
+    .del-btn  { color: #cbd5e0; } .del-btn:hover  { background: #fef2f2; color: #ef4444; }
+    .confirm-btn { background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; border-radius: 7px; padding: 5px 13px; }
+    .confirm-btn:hover { opacity: 0.88; }
+    .cancel-btn { color: #94a3b8; font-size: 12px; } .cancel-btn:hover { background: #f1f5f9; }
+    .add-cat-row {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 16px 20px;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;
+    }
+    .add-cat-row input { border-radius: 8px; font-size: 13px; }
+    .sortable-ghost { opacity: 0.4; }
+    .usage-badge { font-size: 11px; background: #f1f5f9; color: #64748b; border-radius: 50px; padding: 2px 9px; white-space: nowrap; }
+    .save-indicator { font-size: 12px; color: #1a7a4a; display: none; margin-left: 8px; }
+    .save-indicator.show { display: inline-flex; align-items: center; gap: 4px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="manage-subcategories.html"><i class="bi bi-tags"></i> Subcategories</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="kb-breadcrumb">
+    <div class="container">
+      <a href="index.html">Home</a><span class="sep">/</span>
+      <span class="text-muted">Manage Categories</span>
+    </div>
+  </div>
+
+  <div class="container kb-main">
+    <div class="row">
+      <div class="col-lg-8">
+
+        <!-- Token Box -->
+        <div class="kb-token-box mb-4">
+          <div class="kb-token-label"><i class="bi bi-key me-1"></i>GitHub Connection</div>
+          <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected</span></div>
+          <div id="tokenNotSet">
+            <span class="token-not-set d-inline-block mb-2"><i class="bi bi-x-circle me-1"></i>Not set</span>
+            <div class="input-group" style="max-width:500px">
+              <input type="password" class="form-control form-control-sm" id="tokenInput" placeholder="Paste GitHub Personal Access Token..."/>
+              <button class="btn btn-primary btn-sm" onclick="saveToken()">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+          <h4 style="font-family:'Nunito',sans-serif;font-weight:800;margin:0;">
+            <i class="bi bi-grid-3x3-gap me-2" style="color:var(--accent)"></i>Manage Categories
+          </h4>
+          <div class="d-flex align-items-center gap-2">
+            <span class="save-indicator" id="saved-indicator"><i class="bi bi-check-circle-fill text-success"></i> Saved!</span>
+            <button class="btn kb-btn-primary btn-sm" onclick="saveCategories()">
+              <i class="bi bi-cloud-upload me-1"></i>Save to GitHub
+            </button>
+          </div>
+        </div>
+
+        <p class="text-muted small mb-3">Click the <i class="bi bi-pencil"></i> pencil on any row to edit its label, ID, icon, or colour. Drag rows to reorder. Click the trash to remove (only if no notes use that category).</p>
+
+        <!-- Category List -->
+        <div id="catList"></div>
+
+        <!-- Add new category row -->
+        <div class="add-cat-row mt-2">
+          <i class="bi bi-plus-circle" style="color:var(--accent);font-size:20px;flex-shrink:0;"></i>
+          <input type="text" class="form-control form-control-sm" id="newCatLabel" placeholder="Category label (e.g. Excel)" style="max-width:180px"/>
+          <input type="text" class="form-control form-control-sm" id="newCatId"    placeholder="ID (e.g. excel, no spaces)" style="max-width:160px;font-family:monospace;"/>
+          <button class="btn kb-btn-primary btn-sm" onclick="addCategory()">
+            <i class="bi bi-plus me-1"></i>Add Category
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-info-circle"></i> How This Works</h6>
+          <p class="small text-muted mb-2">Categories appear as the top-level groupings for your notes (Power Apps, Power Automate, etc.).</p>
+          <p class="small text-muted mb-2">Click the <strong>pencil</strong> icon to rename a category or change its icon/colour inline. Changes are only saved when you click <strong>Save to GitHub</strong>.</p>
+          <p class="small text-muted mb-2">To remove a category, all notes in that category must first be moved or deleted.</p>
+          <p class="small text-muted mb-0">After saving, refresh the <strong>new-note</strong> and <strong>edit-note</strong> forms to see the updated category list.</p>
+        </div>
+
+        <div class="kb-sidebar-box mt-3">
+          <h6 class="kb-sidebar-title"><i class="bi bi-palette"></i> Available Icons</h6>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span style="font-size:13px;color:#64748b">Click the icon button on any row to pick a new icon.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="kb-footer mt-5"><div class="container text-center"><p class="mb-0 small">Vandam's Knowledge Base &copy; 2026</p></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+  <script>
+    const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
+
+    const PALETTE = [
+      '#7b61ff','#0078d4','#e6a800','#038387','#e87c3e',
+      '#16a34a','#dc2626','#9333ea','#0891b2','#475569',
+      '#db2777','#65a30d','#b45309','#1d4ed8','#0f172a'
+    ];
+
+    const ICONS = [
+      'bi-lightning-charge-fill','bi-arrow-repeat','bi-bar-chart-fill',
+      'bi-diamond-fill','bi-circle','bi-file-earmark-text',
+      'bi-microsoft','bi-grid','bi-tags','bi-journal-text',
+      'bi-code-slash','bi-link-45deg','bi-cloud','bi-database',
+      'bi-gear','bi-people','bi-envelope','bi-calendar',
+      'bi-star','bi-bookmark-fill','bi-chat-square-text',
+      'bi-bell','bi-shield','bi-globe'
+    ];
+
+    const DEFAULT_CATS = [
+      { id:'powerapps',     label:'Power Apps',     icon:'bi-lightning-charge-fill', color:'#7b61ff' },
+      { id:'powerautomate', label:'Power Automate', icon:'bi-arrow-repeat',          color:'#0078d4' },
+      { id:'powerbi',       label:'Power BI',       icon:'bi-bar-chart-fill',        color:'#e6a800' },
+      { id:'sharepoint',    label:'SharePoint',     icon:'bi-diamond-fill',          color:'#038387' },
+      { id:'other',         label:'Other',          icon:'bi-circle',                color:'#e87c3e' }
+    ];
+
+    let categories = [];
+    let notesData  = [];
+    let openPicker = null; // 'color-N' or 'icon-N'
+
+    // ── GitHub helpers ──────────────────────────────────────────────
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function saveToken() {
+      const v = document.getElementById('tokenInput').value.trim();
+      if (!v) return;
+      localStorage.setItem('gh_token', v);
+      document.getElementById('tokenInput').value = '';
+      updateTokenUI();
+    }
+    function updateTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
+    }
+    updateTokenUI();
+
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
+      return r.json();
+    }
+    async function ghPut(path, content, msg, sha) {
+      const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'PUT failed'); }
+    }
+
+    // ── Render ──────────────────────────────────────────────────────
+    function usageCount(catId) {
+      return notesData.filter(n => n.category === catId).length;
+    }
+
+    function render() {
+      const el = document.getElementById('catList');
+      el.innerHTML = categories.map((cat, i) => {
+        const count = usageCount(cat.id);
+        return `
+        <div class="cat-card" id="cat-row-${i}" data-idx="${i}">
+          <span class="drag-handle" title="Drag to reorder"><i class="bi bi-grip-vertical"></i></span>
+          <div class="cat-icon-wrap" style="background:${cat.color}22;">
+            <i class="bi ${cat.icon}" style="color:${cat.color}"></i>
+          </div>
+          <div class="cat-meta">
+            <div class="cat-label-display" onclick="startEdit(${i})" title="Click to edit">${cat.label}</div>
+            <div class="cat-id-display"><code>${cat.id}</code></div>
+          </div>
+          <span class="usage-badge">${count} note${count!==1?'s':''}</span>
+          <div class="cat-actions">
+            <div class="color-picker-wrap">
+              <div class="color-swatch" style="background:${cat.color}" title="Change colour" onclick="togglePicker('color',${i},event)"></div>
+              <div class="color-dropdown" id="color-picker-${i}" style="display:none;">
+                ${PALETTE.map(c=>`<div class="color-dot${c===cat.color?' active':''}" style="background:${c}" onclick="setColor(${i},'${c}',event)" title="${c}"></div>`).join('')}
+              </div>
+            </div>
+            <div class="icon-picker-wrap ms-1">
+              <button class="edit-btn" title="Change icon" onclick="togglePicker('icon',${i},event)">
+                <i class="bi ${cat.icon}"></i>
+              </button>
+              <div class="icon-dropdown" id="icon-picker-${i}" style="display:none;">
+                ${ICONS.map(ic=>`<div class="icon-opt${ic===cat.icon?' active':''}" onclick="setIcon(${i},'${ic}',event)" title="${ic}"><i class="bi ${ic}"></i></div>`).join('')}
+              </div>
+            </div>
+            <button class="edit-btn" title="Rename" onclick="startEdit(${i})"><i class="bi bi-pencil"></i></button>
+            <button class="del-btn" title="Remove category" onclick="removeCategory(${i})" ${count>0?'disabled title="Remove all notes in this category first"':''}><i class="bi bi-trash"></i></button>
+          </div>
+        </div>`;
+      }).join('');
+
+      // Sortable drag-and-drop
+      if (window._sortable) window._sortable.destroy();
+      window._sortable = new Sortable(el, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd(evt) {
+          const moved = categories.splice(evt.oldIndex, 1)[0];
+          categories.splice(evt.newIndex, 0, moved);
+          render();
+        }
+      });
+    }
+
+    // ── Inline Edit ─────────────────────────────────────────────────
+    function startEdit(i) {
+      const row = document.getElementById(`cat-row-${i}`);
+      row.classList.add('editing');
+      const meta = row.querySelector('.cat-meta');
+      meta.innerHTML = `
+        <input class="cat-label-input" id="edit-label-${i}" value="${categories[i].label}" placeholder="Category label"/>
+        <input class="cat-id-input" id="edit-id-${i}" value="${categories[i].id}" placeholder="id (lowercase, no spaces)"/>
+        <div class="d-flex gap-2 mt-2">
+          <button class="confirm-btn" onclick="confirmEdit(${i})"><i class="bi bi-check me-1"></i>Done</button>
+          <button class="cancel-btn" onclick="render()">Cancel</button>
+        </div>`;
+      document.getElementById(`edit-label-${i}`).focus();
+    }
+
+    function confirmEdit(i) {
+      const label = document.getElementById(`edit-label-${i}`).value.trim();
+      const id    = document.getElementById(`edit-id-${i}`).value.trim().toLowerCase().replace(/\s+/g,'');
+      if (!label || !id) { alert('Label and ID are required.'); return; }
+      categories[i].label = label;
+      categories[i].id    = id;
+      render();
+    }
+
+    // ── Colour & Icon Pickers ────────────────────────────────────────
+    function togglePicker(type, i, e) {
+      e.stopPropagation();
+      const key = `${type}-${i}`;
+      const el  = document.getElementById(`${type}-picker-${i}`);
+      const showing = el.style.display === 'flex';
+      // close all pickers
+      document.querySelectorAll('.color-dropdown, .icon-dropdown').forEach(d => d.style.display = 'none');
+      if (!showing) { el.style.display = 'flex'; openPicker = key; }
+      else openPicker = null;
+    }
+    function setColor(i, color, e) {
+      e.stopPropagation();
+      categories[i].color = color;
+      document.querySelectorAll('.color-dropdown').forEach(d => d.style.display = 'none');
+      render();
+    }
+    function setIcon(i, icon, e) {
+      e.stopPropagation();
+      categories[i].icon = icon;
+      document.querySelectorAll('.icon-dropdown').forEach(d => d.style.display = 'none');
+      render();
+    }
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.color-dropdown, .icon-dropdown').forEach(d => d.style.display = 'none');
+    });
+
+    // ── Add / Remove ─────────────────────────────────────────────────
+    function addCategory() {
+      const label = document.getElementById('newCatLabel').value.trim();
+      const id    = document.getElementById('newCatId').value.trim().toLowerCase().replace(/\s+/g,'');
+      if (!label || !id) { alert('Please fill in both Label and ID.'); return; }
+      if (categories.find(c => c.id === id)) { alert(`ID "${id}" already exists.`); return; }
+      categories.push({ id, label, icon: 'bi-circle', color: '#475569' });
+      document.getElementById('newCatLabel').value = '';
+      document.getElementById('newCatId').value = '';
+      render();
+    }
+
+    function removeCategory(i) {
+      if (usageCount(categories[i].id) > 0) { alert('Move or delete all notes in this category first.'); return; }
+      if (!confirm(`Remove category "${categories[i].label}"?`)) return;
+      categories.splice(i, 1);
+      render();
+    }
+
+    // ── Save to GitHub ───────────────────────────────────────────────
+    async function saveCategories() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      try {
+        const df = await ghGet('notes-data.js');
+        let js = decodeURIComponent(escape(atob(df.content.replace(/\n/g,''))));
+
+        // Build the CATEGORIES const string
+        const catStr = `const CATEGORIES = [\n` +
+          categories.map(c =>
+            `  { id: "${c.id}", label: "${c.label}", icon: "${c.icon}", color: "${c.color}" }`
+          ).join(',\n') + '\n];';
+
+        // Replace existing CATEGORIES block or append
+        const pattern = /const CATEGORIES\s*=\s*\[[\s\S]*?\];/;
+        if (pattern.test(js)) {
+          js = js.replace(pattern, catStr);
+        } else {
+          js += '\n\n' + catStr;
+        }
+
+        await ghPut('notes-data.js', js, 'Update CATEGORIES', df.sha);
+
+        const ind = document.getElementById('saved-indicator');
+        ind.classList.add('show');
+        setTimeout(() => ind.classList.remove('show'), 3000);
+      } catch(err) {
+        alert('Save failed: ' + err.message);
+      }
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────
+    function init() {
+      // Use CATEGORIES from notes-data.js if it exists, otherwise fall back to defaults
+      if (typeof CATEGORIES !== 'undefined' && Array.isArray(CATEGORIES) && CATEGORIES.length) {
+        categories = JSON.parse(JSON.stringify(CATEGORIES));
+      } else {
+        categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
+      }
+      notesData = typeof NOTES !== 'undefined' ? NOTES : [];
+      render();
+    }
+
+    const _s = document.createElement('script');
+    _s.src = 'notes-data.js?v=' + Date.now();
+    _s.onload = init;
+    document.body.appendChild(_s);
+  </script>
+</body>
+</html>

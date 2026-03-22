@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quick Guide — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── Layout ── */
+    .qg-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #1d4ed8 100%);
+      padding: 36px 0 30px;
+      color: #fff;
+      margin-bottom: 0;
+    }
+    .qg-hero h1 { font-family:'Nunito',sans-serif; font-weight:800; font-size:2rem; margin-bottom:6px; }
+    .qg-hero p  { opacity:0.8; margin:0; font-size:15px; }
+
+    /* ── App Tabs ── */
+    .qg-tabs {
+      background: #fff;
+      border-bottom: 2px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .qg-tab-list {
+      display: flex; gap: 0; overflow-x: auto; white-space: nowrap;
+      padding: 0 8px; scrollbar-width: none;
+    }
+    .qg-tab-list::-webkit-scrollbar { display: none; }
+    .qg-tab {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 13px 20px; font-size: 13px; font-weight: 700;
+      font-family:'Nunito',sans-serif; color: #64748b;
+      border: none; background: none; cursor: pointer;
+      border-bottom: 3px solid transparent; transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .qg-tab:hover  { color: var(--accent); }
+    .qg-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Search ── */
+    .qg-search-wrap {
+      background: #f8fafc; border-bottom: 1px solid var(--border); padding: 10px 0;
+    }
+    .qg-search { max-width: 480px; }
+
+    /* ── Content pane ── */
+    .qg-pane { display: none; }
+    .qg-pane.active { display: block; }
+
+    /* ── Section within a pane ── */
+    .qg-section { margin-bottom: 32px; }
+    .qg-section-title {
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:15px;
+      color: var(--accent); text-transform:uppercase; letter-spacing:0.06em;
+      margin-bottom:12px; display:flex; align-items:center; gap:7px;
+    }
+
+    /* ── Formula / shortcut cards ── */
+    .qg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .qg-card {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 14px 16px; transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .qg-card:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(99,102,241,0.1); }
+    .qg-card-name {
+      font-family:'Nunito',sans-serif; font-weight:800; font-size:13.5px;
+      margin-bottom: 6px; display:flex; align-items:center; gap:8px;
+    }
+    .qg-tag {
+      font-size: 10px; font-weight: 700; border-radius: 50px; padding: 1px 8px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .tag-formula  { background:#ede9fe; color:#6d28d9; }
+    .tag-shortcut { background:#dcfce7; color:#15803d; }
+    .tag-tip      { background:#fef9c3; color:#a16207; }
+    .tag-expr     { background:#dbeafe; color:#1d4ed8; }
+    .qg-card-code {
+      font-family: 'Courier New', monospace; font-size: 12.5px;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px;
+      padding: 7px 10px; margin-bottom: 7px; color: #1e293b;
+      overflow-x: auto; white-space: pre;
+    }
+    .qg-card-desc { font-size: 12.5px; color: #64748b; line-height: 1.5; }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: #f1f5f9; border: none; border-radius: 6px;
+      padding: 3px 8px; font-size: 11px; color: #64748b; cursor: pointer;
+      transition: background 0.15s; display:none;
+    }
+    .qg-card:hover .copy-btn { display: block; }
+    .copy-btn:hover { background: var(--accent); color: #fff; }
+
+    /* ── Keyboard shortcut display ── */
+    .kbd-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+    .kbd-keys { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+    kbd {
+      background:#f1f5f9; border:1px solid #cbd5e0; border-radius:5px;
+      padding:3px 8px; font-size:12px; font-family:'Courier New',monospace;
+      color:#1e293b; box-shadow:0 1px 0 #94a3b8;
+    }
+    .kbd-plus { color:#94a3b8; font-size:11px; }
+    .kbd-desc { font-size:13px; color:#475569; }
+
+    /* ── Highlight matching search text ── */
+    mark { background:#fef08a; border-radius:3px; padding:0 2px; }
+
+    /* ── No results ── */
+    .no-results { text-align:center; padding:40px 0; color:#94a3b8; }
+    .no-results i { font-size:40px; display:block; margin-bottom:10px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="quick-guide.html"><i class="bi bi-lightning-charge"></i> Quick Guide</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="qg-hero">
+    <div class="container">
+      <h1><i class="bi bi-lightning-charge-fill me-2"></i>Quick Reference Guide</h1>
+      <p>Power Platform formulas, expressions, and keyboard shortcuts — all in one place</p>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="qg-tabs">
+    <div class="container p-0">
+      <div class="qg-tab-list" id="tabList">
+        <button class="qg-tab active" data-pane="powerapps"     onclick="switchTab(this)"><i class="bi bi-lightning-charge-fill" style="color:#7b61ff"></i>Power Apps</button>
+        <button class="qg-tab"        data-pane="powerautomate" onclick="switchTab(this)"><i class="bi bi-arrow-repeat"           style="color:#0078d4"></i>Power Automate</button>
+        <button class="qg-tab"        data-pane="powerbi"       onclick="switchTab(this)"><i class="bi bi-bar-chart-fill"         style="color:#e6a800"></i>Power BI / DAX</button>
+        <button class="qg-tab"        data-pane="sharepoint"    onclick="switchTab(this)"><i class="bi bi-diamond-fill"           style="color:#038387"></i>SharePoint</button>
+        <button class="qg-tab"        data-pane="excel"         onclick="switchTab(this)"><i class="bi bi-file-earmark-spreadsheet" style="color:#217346"></i>Excel</button>
+        <button class="qg-tab"        data-pane="shortcuts"     onclick="switchTab(this)"><i class="bi bi-keyboard"               style="color:#475569"></i>Shortcuts</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="qg-search-wrap">
+    <div class="container">
+      <input type="text" id="qgSearch" class="form-control qg-search" placeholder="🔍  Filter formulas, shortcuts, descriptions..." oninput="filterCards()"/>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="container kb-main">
+
+    <!-- ══════════════════ POWER APPS ══════════════════ -->
+    <div class="qg-pane active" id="pane-powerapps">
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-funnel-fill"></i>Filtering &amp; Lookup</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="filter formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Filter <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Filter(DataSource, Condition)</div>
+            <div class="qg-card-desc">Returns rows that match the condition. Delegable with SharePoint/Dataverse when using simple equality.</div>
+          </div>
+
+          <div class="qg-card" data-tags="search formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Search <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Search(DataSource, SearchTerm, "Col1","Col2")</div>
+            <div class="qg-card-desc">Text-based partial match across specified columns. Not delegable — limited to 500 rows by default.</div>
+          </div>
+
+          <div class="qg-card" data-tags="lookup first formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">LookUp <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">LookUp(DataSource, Condition, ReturnField)</div>
+            <div class="qg-card-desc">Returns the first matching record or a specific field value from a record.</div>
+          </div>
+
+          <div class="qg-card" data-tags="sort formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">SortByColumns <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">SortByColumns(Source, "Column", SortOrder.Ascending)</div>
+            <div class="qg-card-desc">Sorts a table by one or more columns. Delegable to SharePoint and Dataverse.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-pencil-fill"></i>Data Writes</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="patch update create formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Patch — Update <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Patch(DataSource, LookUp(DataSource, ID=varID), {Title: "New"})</div>
+            <div class="qg-card-desc">Updates a specific record. Use Defaults(DataSource) as the second argument to create a new record.</div>
+          </div>
+
+          <div class="qg-card" data-tags="patch create new formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Patch — Create New <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Patch(DataSource, Defaults(DataSource), {Title: "New Item", Status: "Active"})</div>
+            <div class="qg-card-desc">Creates a new record by using Defaults() as the base record.</div>
+          </div>
+
+          <div class="qg-card" data-tags="remove delete formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Remove <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Remove(DataSource, LookUp(DataSource, ID = varID))</div>
+            <div class="qg-card-desc">Deletes a specific record from a data source. Can also remove multiple records with RemoveIf.</div>
+          </div>
+
+          <div class="qg-card" data-tags="collect clearcollect formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">ClearCollect <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">ClearCollect(colMyData, Filter(SharePointList, Status="Active"))</div>
+            <div class="qg-card-desc">Clears a collection then loads new data into it. Use in OnStart or OnVisible to cache data locally.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-signpost-fill"></i>Navigation &amp; Variables</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="navigate screen formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Navigate <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Navigate(ScreenName, ScreenTransition.Fade)</div>
+            <div class="qg-card-desc">Moves to another screen. Use None, Fade, Cover, CoverRight, UnCover, or Slide transitions.</div>
+          </div>
+
+          <div class="qg-card" data-tags="set variable global formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Set (Global Variable) <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Set(varMyVar, "Hello World")</div>
+            <div class="qg-card-desc">Creates or updates a global variable accessible from any screen in the app.</div>
+          </div>
+
+          <div class="qg-card" data-tags="updatecontext variable local formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">UpdateContext (Local Var) <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">UpdateContext({locIsLoading: true})</div>
+            <div class="qg-card-desc">Creates or updates a variable scoped to the current screen only. Prefix with "loc" by convention.</div>
+          </div>
+
+          <div class="qg-card" data-tags="back navigate formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Back <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Back(ScreenTransition.UnCover)</div>
+            <div class="qg-card-desc">Navigates to the previously visited screen, reversing the transition used to arrive.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-braces"></i>Logic &amp; Text</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="if condition formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">If / Switch <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">If(Condition, TrueResult, FalseResult)
+Switch(varStatus, "Active","Green", "Inactive","Red", "Grey")</div>
+            <div class="qg-card-desc">If evaluates a condition; Switch matches a value against multiple cases — cleaner than nested If.</div>
+          </div>
+
+          <div class="qg-card" data-tags="concatenate text formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Concatenate / &amp; <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">"Hello " &amp; User().FullName
+Concatenate("Ref-", Text(ID, "000"))</div>
+            <div class="qg-card-desc">The & operator is shorthand for Concatenate. Text() formats numbers/dates as strings.</div>
+          </div>
+
+          <div class="qg-card" data-tags="isblank empty formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">IsBlank / IsEmpty <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">If(IsBlank(TextInput1.Text), "Required", "OK")
+IsEmpty(colMyCollection)</div>
+            <div class="qg-card-desc">IsBlank checks individual values; IsEmpty checks whether a table/collection has any rows.</div>
+          </div>
+
+          <div class="qg-card" data-tags="now today date formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Now / Today <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">Now()          // date + time
+Today()        // date only
+Text(Now(), "dd/mm/yyyy hh:mm")</div>
+            <div class="qg-card-desc">Returns the current date/time. Wrap with Text() to format for display.</div>
+          </div>
+
+          <div class="qg-card" data-tags="countif sum formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">CountIf / Sum <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">CountIf(SharePointList, Status="Active")
+Sum(colOrders, OrderTotal)</div>
+            <div class="qg-card-desc">CountIf counts rows matching a condition; Sum adds a numeric column across a table.</div>
+          </div>
+
+          <div class="qg-card" data-tags="user email formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">User() <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">User().Email
+User().FullName
+User().Image</div>
+            <div class="qg-card-desc">Returns properties of the currently signed-in user. Useful for personalisation and filtering user-owned records.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /powerapps pane -->
+
+    <!-- ══════════════════ POWER AUTOMATE ══════════════════ -->
+    <div class="qg-pane" id="pane-powerautomate">
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-calendar3"></i>Date &amp; Time Expressions</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="date format expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Format Date <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">formatDateTime(utcNow(), 'dd/MM/yyyy')
+formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm')</div>
+            <div class="qg-card-desc">Formats a UTC timestamp into a readable string. Use single quotes around the format pattern.</div>
+          </div>
+
+          <div class="qg-card" data-tags="add days date expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Add / Subtract Days <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">addDays(utcNow(), 7)
+addDays(utcNow(), -30)
+addDays(triggerBody()?['DueDate'], -3)</div>
+            <div class="qg-card-desc">Adds or subtracts a number of days from a timestamp. Works with trigger/action outputs too.</div>
+          </div>
+
+          <div class="qg-card" data-tags="convert timezone expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Convert Timezone <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">convertTimeZone(utcNow(), 'UTC', 'Mountain Standard Time')</div>
+            <div class="qg-card-desc">Converts a timestamp between time zones. Find zone IDs from the Windows Time Zone list.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-braces-asterisk"></i>String Expressions</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="concat string expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">concat <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">concat('Hello ', triggerBody()?['Title'])</div>
+            <div class="qg-card-desc">Joins two or more strings. Equivalent to using the + operator in other languages.</div>
+          </div>
+
+          <div class="qg-card" data-tags="substring string expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">substring <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">substring(triggerBody()?['Email'], 0, 5)
+indexOf(triggerBody()?['Email'], '@')</div>
+            <div class="qg-card-desc">Extracts a portion of a string. indexOf finds the position of a character.</div>
+          </div>
+
+          <div class="qg-card" data-tags="replace string expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">replace / trim <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">replace(triggerBody()?['Title'], ' ', '-')
+trim(triggerBody()?['Notes'])
+toLower(triggerBody()?['Email'])</div>
+            <div class="qg-card-desc">replace swaps characters, trim removes leading/trailing spaces, toLower lowercases text.</div>
+          </div>
+
+          <div class="qg-card" data-tags="split array expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">split <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">split(triggerBody()?['Tags'], ';')
+first(split(triggerBody()?['FullName'], ' '))</div>
+            <div class="qg-card-desc">Splits a string into an array by delimiter. Use first() / last() to grab individual parts.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-collection"></i>Array &amp; Object Expressions</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="triggerBody body expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">triggerBody / outputs <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">triggerBody()?['FieldName']
+outputs('ActionName')?['body']?['value']</div>
+            <div class="qg-card-desc">The ? (null-safe) operator prevents errors when a property is missing. Always use it on dynamic content.</div>
+          </div>
+
+          <div class="qg-card" data-tags="json parse expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">json / string <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">json(triggerBody()?['JsonField'])
+string(variables('myObject'))</div>
+            <div class="qg-card-desc">json() parses a JSON string into an object; string() serialises an object back to a JSON string.</div>
+          </div>
+
+          <div class="qg-card" data-tags="length count array expression">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">length / empty <span class="qg-tag tag-expr">Expression</span></div>
+            <div class="qg-card-code">length(body('Get_Items')?['value'])
+empty(body('Get_Items')?['value'])</div>
+            <div class="qg-card-desc">length() returns the item count of an array or character count of a string. empty() returns true/false.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-diagram-3-fill"></i>Flow Patterns</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="condition tip">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Condition — Check Null <span class="qg-tag tag-tip">Tip</span></div>
+            <div class="qg-card-code">// In a Condition action, use Expression:
+empty(triggerBody()?['Approver'])</div>
+            <div class="qg-card-desc">Use empty() or equals(..., null) in Condition actions to safely test whether a field was filled in.</div>
+          </div>
+
+          <div class="qg-card" data-tags="do until loop tip">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Do Until — Poll Pattern <span class="qg-tag tag-tip">Tip</span></div>
+            <div class="qg-card-code">// Do Until: @equals(variables('Status'), 'Approved')
+// Inside: Get Item → Set Variable → Delay 5 min</div>
+            <div class="qg-card-desc">Do Until loops repeatedly until a condition is true. Always add a Delay action inside to avoid throttling.</div>
+          </div>
+
+          <div class="qg-card" data-tags="scope error handling tip">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Scope — Error Handling <span class="qg-tag tag-tip">Tip</span></div>
+            <div class="qg-card-code">// Try scope: your actions
+// Catch scope (runAfter = Failed/TimedOut):
+//   Send Email / Log Error</div>
+            <div class="qg-card-desc">Wrap risky actions in a Scope. Set a second Scope to run on failure for a Try/Catch pattern.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /powerautomate pane -->
+
+    <!-- ══════════════════ POWER BI / DAX ══════════════════ -->
+    <div class="qg-pane" id="pane-powerbi">
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-calculator-fill"></i>Core DAX Measures</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="calculate dax formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">CALCULATE <span class="qg-tag tag-formula">DAX</span></div>
+            <div class="qg-card-code">Sales YTD =
+CALCULATE(
+    SUM(Sales[Amount]),
+    DATESYTD(Calendar[Date])
+)</div>
+            <div class="qg-card-desc">Modifies the filter context. The most important DAX function — all time intelligence relies on it.</div>
+          </div>
+
+          <div class="qg-card" data-tags="sumx iterator dax formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">SUMX (Iterator) <span class="qg-tag tag-formula">DAX</span></div>
+            <div class="qg-card-code">Revenue =
+SUMX(
+    Sales,
+    Sales[Qty] * Sales[UnitPrice]
+)</div>
+            <div class="qg-card-desc">Row-by-row evaluation, then aggregation. Use X-functions (SUMX, AVERAGEX, MAXX) when you need row context.</div>
+          </div>
+
+          <div class="qg-card" data-tags="related lookup dax formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">RELATED / RELATEDTABLE <span class="qg-tag tag-formula">DAX</span></div>
+            <div class="qg-card-code">// In Sales table (many side):
+Category = RELATED(Products[Category])
+
+// In Products table (one side):
+SalesCount = COUNTROWS(RELATEDTABLE(Sales))</div>
+            <div class="qg-card-desc">RELATED traverses to the one-side; RELATEDTABLE returns all related rows from the many-side.</div>
+          </div>
+
+          <div class="qg-card" data-tags="divide safe dax formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">DIVIDE (Safe Division) <span class="qg-tag tag-formula">DAX</span></div>
+            <div class="qg-card-code">Margin % =
+DIVIDE(
+    [Gross Profit],
+    [Revenue],
+    0   -- alternate result if denominator = 0
+)</div>
+            <div class="qg-card-desc">Always use DIVIDE instead of / to avoid divide-by-zero errors in measures.</div>
+          </div>
+
+          <div class="qg-card" data-tags="filter all removefilters dax formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">ALL / REMOVEFILTERS <span class="qg-tag tag-formula">DAX</span></div>
+            <div class="qg-card-code">% of Total =
+DIVIDE(
+    [Sales],
+    CALCULATE([Sales], ALL(Sales))
+)</div>
+            <div class="qg-card-desc">ALL removes filters from a table/column. Use inside CALCULATE to compute a grand total ignoring slicers.</div>
+          </div>
+
+          <div class="qg-card" data-tags="previousyear yoy dax formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Year-over-Year <span class="qg-tag tag-formula">DAX</span></div>
+            <div class="qg-card-code">Sales PY =
+CALCULATE([Sales], PREVIOUSYEAR(Calendar[Date]))
+
+YoY % =
+DIVIDE([Sales] - [Sales PY], [Sales PY])</div>
+            <div class="qg-card-desc">PREVIOUSYEAR shifts the date filter back 12 months. Requires a marked Date table in your model.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-table"></i>Power Query (M Language)</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="filter rows query m">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Filter Rows <span class="qg-tag tag-expr">M</span></div>
+            <div class="qg-card-code">Table.SelectRows(Source, each [Status] = "Active")
+Table.SelectRows(Source, each [Amount] > 1000)</div>
+            <div class="qg-card-desc">Filters rows where the condition is true. The each keyword creates a function over each row.</div>
+          </div>
+
+          <div class="qg-card" data-tags="add column query m">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Add Custom Column <span class="qg-tag tag-expr">M</span></div>
+            <div class="qg-card-code">Table.AddColumn(Source, "FullName",
+    each [FirstName] &amp; " " &amp; [LastName])</div>
+            <div class="qg-card-desc">Adds a new calculated column. Reference column names in square brackets inside the each expression.</div>
+          </div>
+
+          <div class="qg-card" data-tags="date year month query m">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Date Parts <span class="qg-tag tag-expr">M</span></div>
+            <div class="qg-card-code">Date.Year([OrderDate])
+Date.Month([OrderDate])
+Date.MonthName([OrderDate], "en-GB")</div>
+            <div class="qg-card-desc">Extract year, month number, or month name from a date column. Used when building a Date dimension table.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /powerbi pane -->
+
+    <!-- ══════════════════ SHAREPOINT ══════════════════ -->
+    <div class="qg-pane" id="pane-sharepoint">
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-funnel-fill"></i>OData / REST Filters</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="odata filter sharepoint rest">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Equality &amp; Comparison <span class="qg-tag tag-expr">OData</span></div>
+            <div class="qg-card-code">Status eq 'Active'
+Amount gt 1000
+Amount le 500
+ModifiedDate ge '2025-01-01T00:00:00Z'</div>
+            <div class="qg-card-desc">eq, ne, gt, ge, lt, le — standard OData comparison operators. String values need single quotes.</div>
+          </div>
+
+          <div class="qg-card" data-tags="odata contains filter sharepoint">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Contains / StartsWith <span class="qg-tag tag-expr">OData</span></div>
+            <div class="qg-card-code">substringof('keyword', Title)
+startswith(Title, 'Project')</div>
+            <div class="qg-card-desc">Text search within a field. Note: substringof is not indexed — use sparingly on large lists.</div>
+          </div>
+
+          <div class="qg-card" data-tags="odata lookup person sharepoint">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Person / Lookup Field <span class="qg-tag tag-expr">OData</span></div>
+            <div class="qg-card-code">AssignedToId eq 42
+// Get current user ID first:
+/_api/web/currentuser</div>
+            <div class="qg-card-desc">Filter by person or lookup column using the numeric ID. Use the REST endpoint to get the current user's ID.</div>
+          </div>
+
+          <div class="qg-card" data-tags="odata and or filter sharepoint">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">AND / OR <span class="qg-tag tag-expr">OData</span></div>
+            <div class="qg-card-code">Status eq 'Active' and Priority eq 'High'
+Status eq 'New' or Status eq 'In Progress'</div>
+            <div class="qg-card-desc">Combine conditions with and / or (lowercase). Use parentheses to control precedence.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-columns-gap"></i>Column Calculated Formulas</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="sharepoint calculated column formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Days Until Due <span class="qg-tag tag-formula">Calculated</span></div>
+            <div class="qg-card-code">=INT([DueDate]-TODAY())</div>
+            <div class="qg-card-desc">Number of days remaining until a due date. Returns negative if overdue. Use in a Calculated column.</div>
+          </div>
+
+          <div class="qg-card" data-tags="sharepoint if status calculated formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Status Label <span class="qg-tag tag-formula">Calculated</span></div>
+            <div class="qg-card-code">=IF([Status]="Approved","✅ Done",IF([Status]="Rejected","❌ Rejected","⏳ Pending"))</div>
+            <div class="qg-card-desc">Nested IF for a friendly status display. Calculated columns don't support lookup to external lists.</div>
+          </div>
+
+          <div class="qg-card" data-tags="sharepoint text concatenate formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">Concat Text Columns <span class="qg-tag tag-formula">Calculated</span></div>
+            <div class="qg-card-code">=[FirstName]&amp;" "&amp;[LastName]
+="REF-"&amp;TEXT([ID],"0000")</div>
+            <div class="qg-card-desc">Join text fields with & and string literals. TEXT() formats numbers — useful for reference codes.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /sharepoint pane -->
+
+    <!-- ══════════════════ EXCEL ══════════════════ -->
+    <div class="qg-pane" id="pane-excel">
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-search"></i>Lookup Formulas</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="xlookup lookup excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">XLOOKUP <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=XLOOKUP(lookup_val, lookup_array, return_array, "Not Found")</div>
+            <div class="qg-card-desc">Modern replacement for VLOOKUP. Searches any direction, returns multiple columns, and handles not-found gracefully.</div>
+          </div>
+
+          <div class="qg-card" data-tags="index match lookup excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">INDEX / MATCH <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=INDEX(ReturnRange, MATCH(LookupVal, LookupRange, 0))</div>
+            <div class="qg-card-desc">The classic flexible lookup. MATCH finds the position; INDEX retrieves the value at that position.</div>
+          </div>
+
+          <div class="qg-card" data-tags="vlookup lookup excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">VLOOKUP <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=VLOOKUP(A2, Sheet2!$A:$C, 3, FALSE)</div>
+            <div class="qg-card-desc">Looks up a value in the first column and returns a value from a specified column. Always use FALSE for exact match.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="qg-section">
+        <div class="qg-section-title"><i class="bi bi-calculator"></i>Aggregate &amp; Conditional</div>
+        <div class="qg-grid">
+
+          <div class="qg-card" data-tags="sumifs countifs excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">SUMIFS / COUNTIFS <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=SUMIFS(SumRange, CriteriaRange1, Criteria1, CriteriaRange2, Criteria2)
+=COUNTIFS(Range1, "Active", Range2, ">"&amp;DATE(2025,1,1))</div>
+            <div class="qg-card-desc">Multi-condition aggregation. Always Sum/Criteria range pairs after the first argument in SUMIFS.</div>
+          </div>
+
+          <div class="qg-card" data-tags="iferror error excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">IFERROR <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=IFERROR(VLOOKUP(A2, Data, 2, 0), "Not Found")</div>
+            <div class="qg-card-desc">Wraps any formula to return a fallback value if an error occurs. Cleaner than nested IF(ISERROR(...)).</div>
+          </div>
+
+          <div class="qg-card" data-tags="text date year month excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">TEXT / Date Parts <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=TEXT(A2,"dd/mm/yyyy")
+=TEXT(A2,"mmmm yyyy")
+=YEAR(A2) &amp; "-Q" &amp; INT((MONTH(A2)-1)/3+1)</div>
+            <div class="qg-card-desc">TEXT formats a date/number as a string. The last formula builds a "2025-Q2" style quarter label.</div>
+          </div>
+
+          <div class="qg-card" data-tags="unique filter spill excel formula">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="qg-card-name">UNIQUE / FILTER (Dynamic Arrays) <span class="qg-tag tag-formula">Formula</span></div>
+            <div class="qg-card-code">=UNIQUE(A2:A100)
+=FILTER(A2:C100, B2:B100="Active", "No results")
+=SORT(UNIQUE(A2:A100))</div>
+            <div class="qg-card-desc">Dynamic array functions that spill results into multiple cells automatically. Available in Excel 365 / 2021+.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /excel pane -->
+
+    <!-- ══════════════════ SHORTCUTS ══════════════════ -->
+    <div class="qg-pane" id="pane-shortcuts">
+
+      <div class="row g-4">
+
+        <div class="col-lg-6">
+          <div class="qg-section">
+            <div class="qg-section-title" style="color:#7b61ff"><i class="bi bi-lightning-charge-fill"></i>Power Apps Studio</div>
+            <div id="shortcuts-pa"></div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="qg-section">
+            <div class="qg-section-title" style="color:#e6a800"><i class="bi bi-bar-chart-fill"></i>Power BI Desktop</div>
+            <div id="shortcuts-pbi"></div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="qg-section">
+            <div class="qg-section-title" style="color:#217346"><i class="bi bi-file-earmark-spreadsheet"></i>Excel</div>
+            <div id="shortcuts-excel"></div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="qg-section">
+            <div class="qg-section-title" style="color:#038387"><i class="bi bi-diamond-fill"></i>SharePoint / Browser</div>
+            <div id="shortcuts-sp"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div><!-- /shortcuts pane -->
+
+  </div><!-- /container -->
+
+  <footer class="kb-footer mt-5">
+    <div class="container text-center">
+      <p class="mb-0 small">Vandam's Knowledge Base &mdash; Quick Reference Guide &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    // ── Keyboard shortcuts data ──────────────────────────────────────
+    const SHORTCUTS = {
+      pa: [
+        { keys:[['Ctrl','S']], desc:'Save the app' },
+        { keys:[['Ctrl','Z']], desc:'Undo last action' },
+        { keys:[['Ctrl','Y']], desc:'Redo' },
+        { keys:[['Ctrl','C']], desc:'Copy selected control(s)' },
+        { keys:[['Ctrl','V']], desc:'Paste control(s)' },
+        { keys:[['Ctrl','D']], desc:'Duplicate selected control' },
+        { keys:[['Del']], desc:'Delete selected control' },
+        { keys:[['Ctrl','A']], desc:'Select all controls on screen' },
+        { keys:[['F5']], desc:'Preview (play) the app' },
+        { keys:[['Esc']], desc:'Exit preview / close popups' },
+        { keys:[['Ctrl','Enter']], desc:'Confirm formula bar input' },
+        { keys:[['Alt','Enter']], desc:'Insert newline in formula bar' },
+        { keys:[['Ctrl','K']], desc:'Insert formula suggestion' },
+        { keys:[['Ctrl','G']], desc:'Open component/screen selector' },
+        { keys:[['Ctrl','Shift','H']], desc:'Toggle hidden items' },
+      ],
+      pbi: [
+        { keys:[['Ctrl','S']], desc:'Save the report' },
+        { keys:[['Ctrl','Z']], desc:'Undo' },
+        { keys:[['Ctrl','Y']], desc:'Redo' },
+        { keys:[['Ctrl','C']], desc:'Copy visual' },
+        { keys:[['Ctrl','V']], desc:'Paste visual' },
+        { keys:[['Alt','Shift','W']], desc:'Focus mode for selected visual' },
+        { keys:[['Ctrl','Shift','F']], desc:'Format visual pane' },
+        { keys:[['Ctrl','Alt','I']], desc:'Toggle insights panel' },
+        { keys:[['F11']], desc:'Full screen mode' },
+        { keys:[['Ctrl','M']], desc:'Add new measure' },
+        { keys:[['Ctrl','Enter']], desc:'Commit DAX formula' },
+        { keys:[['Shift','Enter']], desc:'New line in DAX editor' },
+        { keys:[['Tab']], desc:'Auto-complete in DAX editor' },
+        { keys:[['Ctrl','E']], desc:'Open query editor' },
+      ],
+      excel: [
+        { keys:[['Ctrl','Shift','L']], desc:'Toggle AutoFilter' },
+        { keys:[['Ctrl','T']], desc:'Create/convert to Table' },
+        { keys:[['Ctrl','Shift','+']], desc:'Insert row/column' },
+        { keys:[['Ctrl','-']], desc:'Delete row/column' },
+        { keys:[['Ctrl','D']], desc:'Fill down' },
+        { keys:[['Ctrl','R']], desc:'Fill right' },
+        { keys:[['Ctrl','`']], desc:'Toggle show formulas' },
+        { keys:[['F4']], desc:'Repeat last action / toggle $ in reference' },
+        { keys:[['Ctrl','Shift','Enter']], desc:'Enter array formula (legacy)' },
+        { keys:[['Ctrl','[']], desc:'Go to precedent cells' },
+        { keys:[['Ctrl',']']], desc:'Go to dependent cells' },
+        { keys:[['Alt','=']], desc:'AutoSum selected range' },
+        { keys:[['Ctrl','1']], desc:'Open Format Cells dialog' },
+        { keys:[['Ctrl','Shift','~']], desc:'Apply General number format' },
+        { keys:[['Ctrl','Shift','$']], desc:'Apply Currency format' },
+      ],
+      sp: [
+        { keys:[['Ctrl','F']], desc:'Find on page (browser)' },
+        { keys:[['Alt','D']], desc:'Focus browser address bar' },
+        { keys:[['F12']], desc:'Open browser DevTools (check API calls)' },
+        { keys:[['Ctrl','Shift','I']], desc:'Open DevTools (Chrome)' },
+        { keys:[['Tab']], desc:'Move between SharePoint page zones' },
+        { keys:[['Ctrl','Click']], desc:'Open link in new tab' },
+        { keys:[['Ctrl','Z']], desc:'Undo last list edit (list view)' },
+        { keys:[['Alt','N']], desc:'New item (list toolbar focused)' },
+        { keys:[['Enter']], desc:'Open selected item / confirm' },
+        { keys:[['Shift','F10']], desc:'Open context menu for selected item' },
+      ]
+    };
+
+    function renderShortcuts(data, containerId) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = data.map(s => `
+        <div class="kbd-row" data-tags="shortcut ${s.desc.toLowerCase()}">
+          <div class="kbd-keys">
+            ${s.keys.map(combo =>
+              combo.map(k => `<kbd>${k}</kbd>`).join(`<span class="kbd-plus">+</span>`)
+            ).join('<span style="margin:0 6px;color:#94a3b8">or</span>')}
+          </div>
+          <div class="kbd-desc">${s.desc}</div>
+        </div>`).join('');
+    }
+
+    renderShortcuts(SHORTCUTS.pa,    'shortcuts-pa');
+    renderShortcuts(SHORTCUTS.pbi,   'shortcuts-pbi');
+    renderShortcuts(SHORTCUTS.excel, 'shortcuts-excel');
+    renderShortcuts(SHORTCUTS.sp,    'shortcuts-sp');
+
+    // ── Tab switching ────────────────────────────────────────────────
+    function switchTab(btn) {
+      document.querySelectorAll('.qg-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.qg-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-' + btn.dataset.pane).classList.add('active');
+      document.getElementById('qgSearch').value = '';
+      filterCards();
+    }
+
+    // ── Search / filter ──────────────────────────────────────────────
+    function filterCards() {
+      const q = document.getElementById('qgSearch').value.toLowerCase().trim();
+      // also search shortcuts pane
+      const allRows = document.querySelectorAll('.kbd-row');
+      allRows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        r.style.display = (!q || text.includes(q)) ? '' : 'none';
+      });
+
+      const cards = document.querySelectorAll('.qg-card');
+      let anyVisible = false;
+      cards.forEach(card => {
+        const name = card.querySelector('.qg-card-name')?.textContent.toLowerCase() || '';
+        const desc = card.querySelector('.qg-card-desc')?.textContent.toLowerCase() || '';
+        const code = card.querySelector('.qg-card-code')?.textContent.toLowerCase() || '';
+        const tags = (card.dataset.tags || '').toLowerCase();
+        const match = !q || name.includes(q) || desc.includes(q) || code.includes(q) || tags.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) anyVisible = true;
+      });
+
+      // Show/hide no-results
+      let noRes = document.getElementById('no-results');
+      if (!noRes) {
+        noRes = document.createElement('div');
+        noRes.id = 'no-results';
+        noRes.className = 'no-results';
+        noRes.innerHTML = '<i class="bi bi-search"></i><div>No matching formulas found</div>';
+        document.querySelector('.container.kb-main').appendChild(noRes);
+      }
+      noRes.style.display = (q && !anyVisible) ? 'block' : 'none';
+    }
+
+    // ── Copy code to clipboard ───────────────────────────────────────
+    function copyCode(btn) {
+      const code = btn.closest('.qg-card').querySelector('.qg-card-code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = 'Copied!';
+        btn.style.background = '#16a34a';
+        btn.style.color = '#fff';
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 1600);
+      });
+    }
+
+  </script>
+</body>
+</html>
