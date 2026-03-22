@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Quick Guide — Knowledge Base</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── App tab bar ── */
+    .qg-tabs { background:#fff; border-bottom:2px solid var(--border); position:sticky; top:0; z-index:100; }
+    .qg-tab-list { display:flex; overflow-x:auto; white-space:nowrap; padding:0 8px; scrollbar-width:none; }
+    .qg-tab-list::-webkit-scrollbar { display:none; }
+    .qg-tab {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:12px 18px; font-size:13px; font-weight:700;
+      font-family:'Nunito',sans-serif; color:#64748b;
+      border:none; background:none; cursor:pointer;
+      border-bottom:3px solid transparent; transition:color .15s, border-color .15s;
+    }
+    .qg-tab:hover  { color:var(--accent); }
+    .qg-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+    /* ── Section card ── */
+    .sec-card {
+      background:#fff; border:1.5px solid var(--border); border-radius:12px;
+      margin-bottom:14px; overflow:hidden;
+    }
+    .sec-header {
+      display:flex; align-items:center; gap:10px;
+      padding:13px 16px; cursor:pointer; user-select:none;
+      border-bottom:1px solid transparent; transition:background .12s;
+    }
+    .sec-header:hover { background:#f8fafc; }
+    .sec-header.open  { border-bottom-color:var(--border); }
+    .sec-title { font-family:'Nunito',sans-serif; font-weight:800; font-size:14px; flex:1; }
+    .sec-count { font-size:11px; background:#f1f5f9; color:#64748b; border-radius:50px; padding:2px 9px; }
+    .sec-chevron { color:#94a3b8; transition:transform .2s; }
+    .sec-header.open .sec-chevron { transform:rotate(90deg); }
+    .sec-body { display:none; padding:14px 16px; }
+    .sec-body.show { display:block; }
+
+    /* ── Card row ── */
+    .card-row {
+      display:flex; align-items:center; gap:10px;
+      padding:9px 0; border-bottom:1px solid var(--border);
+    }
+    .card-row:last-child { border-bottom:none; }
+    .card-row-name { flex:1; font-size:13.5px; font-weight:700; font-family:'Nunito',sans-serif; }
+    .card-row-tag  { font-size:10px; font-weight:700; border-radius:50px; padding:1px 8px; text-transform:uppercase; }
+    .tag-formula  { background:#ede9fe; color:#6d28d9; }
+    .tag-expr     { background:#dbeafe; color:#1d4ed8; }
+    .tag-tip      { background:#fef9c3; color:#a16207; }
+    .tag-shortcut { background:#dcfce7; color:#15803d; }
+    .icon-btn { background:none; border:none; border-radius:7px; padding:5px 8px; cursor:pointer; font-size:14px; transition:background .12s; }
+    .icon-btn:hover { background:#f1f5f9; }
+    .icon-btn.del:hover { background:#fef2f2; color:#ef4444; }
+
+    /* ── Shortcut row ── */
+    .sc-row {
+      display:flex; align-items:center; gap:10px; padding:8px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .sc-row:last-child { border-bottom:none; }
+    .sc-keys { display:flex; gap:4px; flex-wrap:wrap; flex-shrink:0; min-width:140px; }
+    kbd { background:#f1f5f9; border:1px solid #cbd5e0; border-radius:5px; padding:2px 7px; font-size:11px; color:#1e293b; box-shadow:0 1px 0 #94a3b8; }
+    .sc-desc { flex:1; font-size:13px; color:#475569; }
+
+    /* ── Modal ── */
+    .modal-header { border-bottom:1px solid var(--border); }
+    .modal-footer { border-top:1px solid var(--border); }
+    .form-label   { font-size:13px; font-weight:600; margin-bottom:4px; }
+    textarea.form-control { font-family:'Courier New',monospace; font-size:12.5px; resize:vertical; }
+    .tag-preview  { display:inline-block; margin-top:6px; }
+
+    /* ── Status bar ── */
+    .status-bar   { position:fixed; bottom:20px; right:24px; z-index:1000; }
+    .status-toast { background:#1e293b; color:#fff; border-radius:10px; padding:10px 18px; font-size:13px; display:none; box-shadow:0 4px 20px rgba(0,0,0,0.2); }
+    .status-toast.show { display:flex; align-items:center; gap:8px; animation:fadeUp .25s; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Empty state ── */
+    .empty-state { text-align:center; padding:30px 0; color:#94a3b8; }
+    .empty-state i { font-size:32px; display:block; margin-bottom:8px; }
+
+    /* ── Add section row ── */
+    .add-section-bar {
+      border:2px dashed var(--border); border-radius:12px; padding:12px 16px;
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark kb-navbar">
+    <div class="container">
+      <a class="navbar-brand kb-brand" href="index.html"><i class="bi bi-journal-bookmark-fill"></i> Vandam's Knowledge Base</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Home</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown"><i class="bi bi-journal-text"></i> Notes</a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><a class="dropdown-item" href="new-note.html"><i class="bi bi-file-plus"></i> New Note</a></li>
+              <li><a class="dropdown-item" href="manage-notes.html"><i class="bi bi-pencil-square"></i> Manage Notes</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown"><i class="bi bi-chat-square-text"></i> Prompts</a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><a class="dropdown-item" href="new-prompt.html"><i class="bi bi-plus-square"></i> New Prompt</a></li>
+              <li><a class="dropdown-item" href="manage-prompts.html"><i class="bi bi-pencil-square"></i> Manage Prompts</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown"><i class="bi bi-link-45deg"></i> Links</a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><a class="dropdown-item" href="new-link.html"><i class="bi bi-plus-circle"></i> Add Link</a></li>
+              <li><a class="dropdown-item" href="manage-links.html"><i class="bi bi-pencil-square"></i> Manage Links</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown"><i class="bi bi-gear-fill"></i> Settings</a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><h6 class="dropdown-header">Manage</h6></li>
+              <li><a class="dropdown-item" href="manage-categories.html"><i class="bi bi-grid-3x3-gap"></i> Categories</a></li>
+              <li><a class="dropdown-item" href="manage-subcategories.html"><i class="bi bi-tags"></i> Subcategories</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Reference</h6></li>
+              <li><a class="dropdown-item" href="quick-guide.html"><i class="bi bi-lightning-charge-fill"></i> Quick Guide</a></li>
+              <li><a class="dropdown-item" href="manage-quick-guide.html"><i class="bi bi-pencil-square"></i> Edit Quick Guide</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="kb-breadcrumb">
+    <div class="container">
+      <a href="index.html">Home</a><span class="sep">/</span>
+      <a href="quick-guide.html">Quick Guide</a><span class="sep">/</span>
+      <span class="text-muted">Edit</span>
+    </div>
+  </div>
+
+  <!-- App Tab Bar -->
+  <div class="qg-tabs">
+    <div class="container p-0">
+      <div class="qg-tab-list" id="tabList"></div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="container kb-main">
+    <div class="row">
+      <div class="col-lg-9">
+
+        <!-- Token -->
+        <div class="kb-token-box mb-4">
+          <div class="kb-token-label"><i class="bi bi-key me-1"></i>GitHub Connection</div>
+          <div id="tokenConnected" style="display:none;"><span class="token-connected"><i class="bi bi-check-circle me-1"></i>Connected</span></div>
+          <div id="tokenNotSet">
+            <span class="token-not-set d-inline-block mb-2"><i class="bi bi-x-circle me-1"></i>Not set</span>
+            <div class="input-group" style="max-width:500px">
+              <input type="password" class="form-control form-control-sm" id="tokenInput" placeholder="Paste GitHub Personal Access Token..."/>
+              <button class="btn btn-primary btn-sm" onclick="saveToken()">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content area switches per tab -->
+        <div id="mainContent"></div>
+
+      </div>
+      <div class="col-lg-3">
+        <div class="kb-sidebar-box">
+          <h6 class="kb-sidebar-title"><i class="bi bi-info-circle"></i> How to Edit</h6>
+          <p class="small text-muted mb-2">Select a tab to edit that app's formula sections.</p>
+          <p class="small text-muted mb-2">Each tab has <strong>sections</strong> (e.g. "Filtering &amp; Lookup") that contain <strong>cards</strong>. Click a section header to expand it.</p>
+          <p class="small text-muted mb-2">Use <strong>+ Add Card</strong> to add a new formula entry. Use the <i class="bi bi-pencil text-primary"></i> to edit an existing one.</p>
+          <p class="small text-muted mb-2">The <strong>Shortcuts</strong> tab lets you add/edit keyboard shortcuts per application group.</p>
+          <p class="small text-muted mb-0">Click <strong>Save to GitHub</strong> when done — changes go live on your site immediately.</p>
+        </div>
+        <div class="kb-sidebar-box mt-3">
+          <h6 class="kb-sidebar-title"><i class="bi bi-cloud-upload"></i> Save Changes</h6>
+          <p class="small text-muted mb-3">Saves the entire quick-guide-data.js file to your GitHub repo.</p>
+          <button class="btn kb-btn-primary w-100" onclick="saveToGitHub()">
+            <i class="bi bi-cloud-upload me-1"></i>Save to GitHub
+          </button>
+          <a href="quick-guide.html" class="btn btn-outline-secondary w-100 mt-2 btn-sm">
+            <i class="bi bi-eye me-1"></i>Preview Quick Guide
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="kb-footer mt-5"><div class="container text-center"><p class="mb-0 small">Vandam's Knowledge Base &copy; 2026</p></div></footer>
+
+  <!-- ── Card Edit Modal ── -->
+  <div class="modal fade" id="cardModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cardModalTitle" style="font-family:'Nunito',sans-serif;font-weight:800;">Add Card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Card Name *</label>
+              <input type="text" class="form-control" id="cm-name" placeholder="e.g. Filter, CALCULATE, XLOOKUP"/>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Tag Label *</label>
+              <input type="text" class="form-control" id="cm-tag" placeholder="Formula, DAX, Tip, M…"/>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Tag Style</label>
+              <select class="form-select" id="cm-tagtype" onchange="updateTagPreview()">
+                <option value="formula">Purple — Formula</option>
+                <option value="expr">Blue — Expression</option>
+                <option value="tip">Yellow — Tip</option>
+                <option value="shortcut">Green — Shortcut</option>
+              </select>
+              <div class="tag-preview"><span id="cm-tag-preview" class="qg-tag tag-formula">Formula</span></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Code / Formula <span class="text-muted small">(use \n for line breaks)</span></label>
+              <textarea class="form-control" id="cm-code" rows="5" placeholder="Filter(DataSource, Condition)&#10;// or multi-line example"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description *</label>
+              <textarea class="form-control" id="cm-desc" rows="3" placeholder="What this formula does and when to use it..." style="font-family:inherit;font-size:13px;"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Search Tags <span class="text-muted small">(space-separated)</span></label>
+              <input type="text" class="form-control" id="cm-tags" placeholder="filter formula delegation sharepoint"/>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn kb-btn-primary" onclick="saveCard()"><i class="bi bi-check-lg me-1"></i>Save Card</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section Edit Modal ── -->
+  <div class="modal fade" id="sectionModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="secModalTitle" style="font-family:'Nunito',sans-serif;font-weight:800;">Add Section</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Section Title *</label>
+            <input type="text" class="form-control" id="sm-title" placeholder="e.g. Filtering & Lookup"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Icon <span class="text-muted small">(Bootstrap Icons class)</span></label>
+            <input type="text" class="form-control" id="sm-icon" placeholder="bi-funnel-fill"/>
+            <div class="form-text">Browse at <a href="https://icons.getbootstrap.com" target="_blank">icons.getbootstrap.com</a></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn kb-btn-primary" onclick="saveSection()"><i class="bi bi-check-lg me-1"></i>Save Section</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Shortcut Edit Modal ── -->
+  <div class="modal fade" id="scModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="scModalTitle" style="font-family:'Nunito',sans-serif;font-weight:800;">Add Shortcut</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Key Combination *</label>
+            <input type="text" class="form-control" id="scm-keys" placeholder="Ctrl+S  or  Ctrl+Shift+Enter"/>
+            <div class="form-text">Use <code>+</code> to separate keys. For two combos, separate with <code>|</code> (e.g. <code>Ctrl+S | Cmd+S</code>).</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description *</label>
+            <input type="text" class="form-control" id="scm-desc" placeholder="Save the app"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn kb-btn-primary" onclick="saveShortcut()"><i class="bi bi-check-lg me-1"></i>Save Shortcut</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Shortcut Group Modal ── -->
+  <div class="modal fade" id="scGroupModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="scgModalTitle" style="font-family:'Nunito',sans-serif;font-weight:800;">Add Shortcut Group</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Group ID * <span class="text-muted small">(lowercase, no spaces)</span></label>
+            <input type="text" class="form-control" id="scg-id" placeholder="e.g. vscode, teams"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Label *</label>
+            <input type="text" class="form-control" id="scg-label" placeholder="VS Code"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Icon <span class="text-muted small">(Bootstrap Icons class)</span></label>
+            <input type="text" class="form-control" id="scg-icon" placeholder="bi-code-slash"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Colour</label>
+            <input type="color" class="form-control form-control-color" id="scg-color" value="#475569"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn kb-btn-primary" onclick="saveShortcutGroup()"><i class="bi bi-check-lg me-1"></i>Save Group</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status toast -->
+  <div class="status-bar">
+    <div class="status-toast" id="statusToast"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const GITHUB_USER = 'vandam2', GITHUB_REPO = 'vandam2.github.io', GITHUB_BRANCH = 'main';
+    const FILE_PATH = 'quick-guide-data.js';
+
+    // ── GitHub helpers ─────────────────────────────────────────────
+    function getToken() { return localStorage.getItem('gh_token') || ''; }
+    function saveToken() {
+      const v = document.getElementById('tokenInput').value.trim();
+      if (!v) return;
+      localStorage.setItem('gh_token', v);
+      document.getElementById('tokenInput').value = '';
+      updateTokenUI();
+    }
+    function updateTokenUI() {
+      const has = !!getToken();
+      document.getElementById('tokenConnected').style.display = has ? 'block' : 'none';
+      document.getElementById('tokenNotSet').style.display    = has ? 'none'  : 'block';
+    }
+    updateTokenUI();
+
+    async function ghGet(path) {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?t=${Date.now()}`, {
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (!r.ok) throw new Error(`GET failed: ${r.status}`);
+      return r.json();
+    }
+    async function ghPut(path, content, msg, sha) {
+      const body = { message: msg, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'PUT failed'); }
+    }
+
+    // ── State ──────────────────────────────────────────────────────
+    let data    = {};   // QG_DATA  copy
+    let tabs    = [];   // QG_TABS  copy
+    let shorts  = {};   // QG_SHORTCUTS copy
+    let activeTab = '';
+
+    // Edit context
+    let _editMode   = null;  // 'add' | 'edit'
+    let _editTabId  = null;
+    let _editSecIdx = null;
+    let _editCardIdx= null;
+    let _editScGroup= null;
+    let _editScIdx  = null;
+    let _editSecMode= null;
+
+    // ── Toast ──────────────────────────────────────────────────────
+    function toast(msg, type='success') {
+      const el = document.getElementById('statusToast');
+      const icon = type === 'success' ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger';
+      el.innerHTML = `<i class="bi ${icon} me-2"></i>${msg}`;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    // ── Build tab bar ──────────────────────────────────────────────
+    function buildTabs() {
+      const el = document.getElementById('tabList');
+      el.innerHTML = tabs.map(t => `
+        <button class="qg-tab${t.id === activeTab ? ' active' : ''}" onclick="switchTab('${t.id}')">
+          <i class="bi ${t.icon}" style="color:${t.color}"></i>${t.label}
+        </button>`).join('');
+    }
+
+    function switchTab(id) {
+      activeTab = id;
+      buildTabs();
+      renderContent();
+    }
+
+    // ── Render main content area ───────────────────────────────────
+    function renderContent() {
+      const el = document.getElementById('mainContent');
+      if (activeTab === 'shortcuts') { renderShortcutsEditor(el); return; }
+      renderFormulasEditor(el, activeTab);
+    }
+
+    // ─── Formula sections editor ───────────────────────────────────
+    function renderFormulasEditor(el, tabId) {
+      const sections = data[tabId] || [];
+      const tabMeta  = tabs.find(t => t.id === tabId) || {};
+      let html = `
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+          <h5 style="font-family:'Nunito',sans-serif;font-weight:800;margin:0;">
+            <i class="bi ${tabMeta.icon || 'bi-circle'}" style="color:${tabMeta.color||'#64748b'}"></i>
+            &nbsp;${tabMeta.label || tabId} Entries
+          </h5>
+          <button class="btn kb-btn-primary btn-sm" onclick="openAddSection('${tabId}')">
+            <i class="bi bi-plus-circle me-1"></i>Add Section
+          </button>
+        </div>`;
+
+      if (sections.length === 0) {
+        html += `<div class="empty-state"><i class="bi bi-folder-plus"></i>No sections yet — click "Add Section" to start.</div>`;
+      }
+
+      sections.forEach((sec, si) => {
+        html += `
+          <div class="sec-card" id="sec-${tabId}-${si}">
+            <div class="sec-header" onclick="toggleSection(this)" id="sec-hdr-${tabId}-${si}">
+              <i class="bi ${sec.icon || 'bi-circle'}" style="color:var(--accent)"></i>
+              <span class="sec-title">${sec.title}</span>
+              <span class="sec-count">${sec.cards.length} card${sec.cards.length!==1?'s':''}</span>
+              <button class="icon-btn ms-1" title="Edit section" onclick="event.stopPropagation();openEditSection('${tabId}',${si})"><i class="bi bi-pencil"></i></button>
+              <button class="icon-btn del ms-1" title="Delete section" onclick="event.stopPropagation();deleteSection('${tabId}',${si})"><i class="bi bi-trash"></i></button>
+              <i class="bi bi-chevron-right sec-chevron ms-1"></i>
+            </div>
+            <div class="sec-body" id="sec-body-${tabId}-${si}">`;
+
+        if (sec.cards.length === 0) {
+          html += `<div class="empty-state" style="padding:16px 0"><i class="bi bi-card-list"></i>No cards yet.</div>`;
+        } else {
+          sec.cards.forEach((card, ci) => {
+            html += `
+              <div class="card-row">
+                <span class="card-row-name">${card.name}</span>
+                <span class="card-row-tag tag-${card.tagType||'formula'}">${card.tag}</span>
+                <button class="icon-btn" title="Edit" onclick="openEditCard('${tabId}',${si},${ci})"><i class="bi bi-pencil text-primary"></i></button>
+                <button class="icon-btn del" title="Delete" onclick="deleteCard('${tabId}',${si},${ci})"><i class="bi bi-trash"></i></button>
+              </div>`;
+          });
+        }
+        html += `
+              <div class="mt-3">
+                <button class="btn btn-outline-primary btn-sm" onclick="openAddCard('${tabId}',${si})">
+                  <i class="bi bi-plus me-1"></i>Add Card
+                </button>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      el.innerHTML = html;
+    }
+
+    function toggleSection(hdr) {
+      hdr.classList.toggle('open');
+      const bodyId = hdr.id.replace('sec-hdr-', 'sec-body-');
+      const body = document.getElementById(bodyId);
+      if (body) body.classList.toggle('show');
+    }
+
+    // ─── Shortcuts editor ──────────────────────────────────────────
+    function renderShortcutsEditor(el) {
+      let html = `
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+          <h5 style="font-family:'Nunito',sans-serif;font-weight:800;margin:0;">
+            <i class="bi bi-keyboard" style="color:#475569"></i>&nbsp;Shortcuts
+          </h5>
+          <button class="btn kb-btn-primary btn-sm" onclick="openAddShortcutGroup()">
+            <i class="bi bi-plus-circle me-1"></i>Add Group
+          </button>
+        </div>`;
+
+      const groups = Object.keys(shorts);
+      if (!groups.length) {
+        html += `<div class="empty-state"><i class="bi bi-keyboard"></i>No shortcut groups yet.</div>`;
+      }
+
+      groups.forEach(gid => {
+        const g = shorts[gid];
+        html += `
+          <div class="sec-card" id="sc-card-${gid}">
+            <div class="sec-header" onclick="toggleSection(this)" id="sec-hdr-shortcuts-${gid}">
+              <i class="bi ${g.icon}" style="color:${g.color}"></i>
+              <span class="sec-title">${g.label}</span>
+              <span class="sec-count">${g.items.length} shortcut${g.items.length!==1?'s':''}</span>
+              <button class="icon-btn del ms-1" title="Delete group" onclick="event.stopPropagation();deleteShortcutGroup('${gid}')"><i class="bi bi-trash"></i></button>
+              <i class="bi bi-chevron-right sec-chevron ms-1"></i>
+            </div>
+            <div class="sec-body" id="sec-body-shortcuts-${gid}">`;
+
+        if (!g.items.length) {
+          html += `<div class="empty-state" style="padding:12px 0"><i class="bi bi-keyboard"></i>No shortcuts yet.</div>`;
+        }
+        g.items.forEach((sc, si) => {
+          const keysHtml = sc.keys.map(combo =>
+            combo.map(k => `<kbd>${k}</kbd>`).join('<span style="color:#94a3b8;margin:0 2px">+</span>')
+          ).join('<span style="margin:0 6px;color:#94a3b8">or</span>');
+          html += `
+            <div class="sc-row">
+              <div class="sc-keys">${keysHtml}</div>
+              <div class="sc-desc">${sc.desc}</div>
+              <button class="icon-btn" title="Edit" onclick="openEditShortcut('${gid}',${si})"><i class="bi bi-pencil text-primary"></i></button>
+              <button class="icon-btn del" title="Delete" onclick="deleteShortcut('${gid}',${si})"><i class="bi bi-trash"></i></button>
+            </div>`;
+        });
+        html += `
+              <div class="mt-3">
+                <button class="btn btn-outline-primary btn-sm" onclick="openAddShortcut('${gid}')">
+                  <i class="bi bi-plus me-1"></i>Add Shortcut
+                </button>
+              </div>
+            </div>
+          </div>`;
+      });
+      el.innerHTML = html;
+    }
+
+    // ─── CARD modal ────────────────────────────────────────────────
+    const cardModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('cardModal'));
+
+    function openAddCard(tabId, si) {
+      _editMode='add'; _editTabId=tabId; _editSecIdx=si; _editCardIdx=null;
+      document.getElementById('cardModalTitle').textContent = 'Add Card';
+      ['cm-name','cm-tag','cm-code','cm-desc','cm-tags'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cm-tagtype').value = 'formula';
+      updateTagPreview();
+      cardModal().show();
+    }
+
+    function openEditCard(tabId, si, ci) {
+      _editMode='edit'; _editTabId=tabId; _editSecIdx=si; _editCardIdx=ci;
+      const card = data[tabId][si].cards[ci];
+      document.getElementById('cardModalTitle').textContent = 'Edit Card';
+      document.getElementById('cm-name').value    = card.name;
+      document.getElementById('cm-tag').value     = card.tag;
+      document.getElementById('cm-tagtype').value = card.tagType || 'formula';
+      document.getElementById('cm-code').value    = card.code;
+      document.getElementById('cm-desc').value    = card.desc;
+      document.getElementById('cm-tags').value    = card.tags || '';
+      updateTagPreview();
+      cardModal().show();
+    }
+
+    function updateTagPreview() {
+      const type  = document.getElementById('cm-tagtype').value;
+      const label = document.getElementById('cm-tag').value || 'Formula';
+      const el    = document.getElementById('cm-tag-preview');
+      el.className = `qg-tag tag-${type}`;
+      el.textContent = label;
+    }
+    document.getElementById('cm-tag').addEventListener('input', updateTagPreview);
+
+    function saveCard() {
+      const name = document.getElementById('cm-name').value.trim();
+      const tag  = document.getElementById('cm-tag').value.trim();
+      const code = document.getElementById('cm-code').value;
+      const desc = document.getElementById('cm-desc').value.trim();
+      if (!name || !tag || !desc) { alert('Name, Tag and Description are required.'); return; }
+
+      const card = {
+        id:      _editCardIdx !== null ? data[_editTabId][_editSecIdx].cards[_editCardIdx].id : `${_editTabId}-${Date.now()}`,
+        name,
+        tag,
+        tagType: document.getElementById('cm-tagtype').value,
+        code,
+        desc,
+        tags:    document.getElementById('cm-tags').value.trim()
+      };
+
+      if (!data[_editTabId]) data[_editTabId] = [];
+      if (_editMode === 'add') {
+        data[_editTabId][_editSecIdx].cards.push(card);
+      } else {
+        data[_editTabId][_editSecIdx].cards[_editCardIdx] = card;
+      }
+
+      cardModal().hide();
+      renderContent();
+      toast('Card saved — remember to push to GitHub!');
+    }
+
+    function deleteCard(tabId, si, ci) {
+      if (!confirm('Delete this card?')) return;
+      data[tabId][si].cards.splice(ci, 1);
+      renderContent();
+      toast('Card deleted', 'error');
+    }
+
+    // ─── SECTION modal ─────────────────────────────────────────────
+    const secModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('sectionModal'));
+
+    function openAddSection(tabId) {
+      _editTabId=tabId; _editSecMode='add'; _editSecIdx=null;
+      document.getElementById('secModalTitle').textContent = 'Add Section';
+      document.getElementById('sm-title').value = '';
+      document.getElementById('sm-icon').value  = 'bi-circle';
+      secModal().show();
+    }
+
+    function openEditSection(tabId, si) {
+      _editTabId=tabId; _editSecMode='edit'; _editSecIdx=si;
+      const sec = data[tabId][si];
+      document.getElementById('secModalTitle').textContent = 'Edit Section';
+      document.getElementById('sm-title').value = sec.title;
+      document.getElementById('sm-icon').value  = sec.icon || 'bi-circle';
+      secModal().show();
+    }
+
+    function saveSection() {
+      const title = document.getElementById('sm-title').value.trim();
+      const icon  = document.getElementById('sm-icon').value.trim() || 'bi-circle';
+      if (!title) { alert('Section title is required.'); return; }
+
+      if (!data[_editTabId]) data[_editTabId] = [];
+
+      if (_editSecMode === 'add') {
+        data[_editTabId].push({ id: `${_editTabId}-${Date.now()}`, title, icon, cards: [] });
+      } else {
+        data[_editTabId][_editSecIdx].title = title;
+        data[_editTabId][_editSecIdx].icon  = icon;
+      }
+      secModal().hide();
+      renderContent();
+      toast('Section saved');
+    }
+
+    function deleteSection(tabId, si) {
+      const sec = data[tabId][si];
+      if (sec.cards.length > 0 && !confirm(`Delete section "${sec.title}" and its ${sec.cards.length} card(s)?`)) return;
+      if (sec.cards.length === 0 && !confirm(`Delete section "${sec.title}"?`)) return;
+      data[tabId].splice(si, 1);
+      renderContent();
+      toast('Section deleted', 'error');
+    }
+
+    // ─── SHORTCUT modals ───────────────────────────────────────────
+    const scModal  = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('scModal'));
+    const scgModal = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('scGroupModal'));
+
+    function keysFromString(str) {
+      // "Ctrl+Shift+S | Cmd+S" → [ ['Ctrl','Shift','S'], ['Cmd','S'] ]
+      return str.split('|').map(part => part.trim().split('+').map(k => k.trim()).filter(Boolean));
+    }
+    function keysToString(keys) {
+      // [ ['Ctrl','S'], ['Cmd','S'] ] → "Ctrl+S | Cmd+S"
+      return keys.map(combo => combo.join('+')).join(' | ');
+    }
+
+    function openAddShortcut(gid) {
+      _editScGroup=gid; _editScIdx=null; _editMode='add';
+      document.getElementById('scModalTitle').textContent = 'Add Shortcut';
+      document.getElementById('scm-keys').value = '';
+      document.getElementById('scm-desc').value = '';
+      scModal().show();
+    }
+
+    function openEditShortcut(gid, si) {
+      _editScGroup=gid; _editScIdx=si; _editMode='edit';
+      const sc = shorts[gid].items[si];
+      document.getElementById('scModalTitle').textContent = 'Edit Shortcut';
+      document.getElementById('scm-keys').value = keysToString(sc.keys);
+      document.getElementById('scm-desc').value = sc.desc;
+      scModal().show();
+    }
+
+    function saveShortcut() {
+      const keysStr = document.getElementById('scm-keys').value.trim();
+      const desc    = document.getElementById('scm-desc').value.trim();
+      if (!keysStr || !desc) { alert('Keys and description are required.'); return; }
+      const sc = { keys: keysFromString(keysStr), desc };
+      if (_editMode === 'add') {
+        shorts[_editScGroup].items.push(sc);
+      } else {
+        shorts[_editScGroup].items[_editScIdx] = sc;
+      }
+      scModal().hide();
+      renderContent();
+      toast('Shortcut saved');
+    }
+
+    function deleteShortcut(gid, si) {
+      if (!confirm('Delete this shortcut?')) return;
+      shorts[gid].items.splice(si, 1);
+      renderContent();
+      toast('Shortcut deleted', 'error');
+    }
+
+    function openAddShortcutGroup() {
+      document.getElementById('scgModalTitle').textContent = 'Add Shortcut Group';
+      ['scg-id','scg-label','scg-icon'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('scg-icon').value = 'bi-keyboard';
+      document.getElementById('scg-color').value = '#475569';
+      scgModal().show();
+    }
+
+    function saveShortcutGroup() {
+      const id    = document.getElementById('scg-id').value.trim().toLowerCase().replace(/\s+/g,'');
+      const label = document.getElementById('scg-label').value.trim();
+      const icon  = document.getElementById('scg-icon').value.trim() || 'bi-keyboard';
+      const color = document.getElementById('scg-color').value;
+      if (!id || !label) { alert('ID and Label are required.'); return; }
+      if (shorts[id]) { alert(`Group ID "${id}" already exists.`); return; }
+      shorts[id] = { label, icon, color, items: [] };
+      scgModal().hide();
+      renderContent();
+      toast('Shortcut group added');
+    }
+
+    function deleteShortcutGroup(gid) {
+      if (!confirm(`Delete shortcut group "${shorts[gid].label}"?`)) return;
+      delete shorts[gid];
+      renderContent();
+      toast('Group deleted', 'error');
+    }
+
+    // ─── Save to GitHub ────────────────────────────────────────────
+    function escStr(s) {
+      return (s || '').replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\${/g, '\\${');
+    }
+
+    function serializeData() {
+      let out = `// ─────────────────────────────────────────────\n`;
+      out += `//  Quick Guide Data  —  quick-guide-data.js\n`;
+      out += `//  Edit via manage-quick-guide.html\n`;
+      out += `// ─────────────────────────────────────────────\n\n`;
+
+      // QG_TABS
+      out += `const QG_TABS = ${JSON.stringify(tabs, null, 2)};\n\n`;
+
+      // QG_DATA
+      out += `const QG_DATA = {\n\n`;
+      Object.keys(data).forEach((tabId, ti) => {
+        out += `  ${tabId}: [\n`;
+        (data[tabId] || []).forEach((sec, si) => {
+          out += `    {\n`;
+          out += `      id: ${JSON.stringify(sec.id)},\n`;
+          out += `      title: ${JSON.stringify(sec.title)},\n`;
+          out += `      icon: ${JSON.stringify(sec.icon || 'bi-circle')},\n`;
+          out += `      cards: [\n`;
+          (sec.cards || []).forEach((card, ci) => {
+            out += `        { id: ${JSON.stringify(card.id)}, name: ${JSON.stringify(card.name)}, tag: ${JSON.stringify(card.tag)}, tagType: ${JSON.stringify(card.tagType||'formula')}, code: ${JSON.stringify(card.code)}, desc: ${JSON.stringify(card.desc)}, tags: ${JSON.stringify(card.tags||'')} }`;
+            out += ci < sec.cards.length-1 ? ',\n' : '\n';
+          });
+          out += `      ]\n`;
+          out += `    }`;
+          out += si < data[tabId].length-1 ? ',\n' : '\n';
+        });
+        out += `  ]`;
+        const keys = Object.keys(data);
+        out += ti < keys.length-1 ? ',\n\n' : '\n\n';
+      });
+      out += `};\n\n`;
+
+      // QG_SHORTCUTS
+      out += `const QG_SHORTCUTS = {\n`;
+      const gids = Object.keys(shorts);
+      gids.forEach((gid, gi) => {
+        const g = shorts[gid];
+        out += `  ${gid}: {\n`;
+        out += `    label: ${JSON.stringify(g.label)},\n`;
+        out += `    icon: ${JSON.stringify(g.icon)},\n`;
+        out += `    color: ${JSON.stringify(g.color)},\n`;
+        out += `    items: [\n`;
+        g.items.forEach((sc, si) => {
+          out += `      { keys: ${JSON.stringify(sc.keys)}, desc: ${JSON.stringify(sc.desc)} }`;
+          out += si < g.items.length-1 ? ',\n' : '\n';
+        });
+        out += `    ]\n  }`;
+        out += gi < gids.length-1 ? ',\n' : '\n';
+      });
+      out += `};\n`;
+      return out;
+    }
+
+    async function saveToGitHub() {
+      if (!getToken()) { alert('Please set your GitHub token first.'); return; }
+      const btn = document.querySelector('[onclick="saveToGitHub()"]');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving…';
+      try {
+        const df = await ghGet(FILE_PATH);
+        const content = serializeData();
+        await ghPut(FILE_PATH, content, 'Update quick-guide-data.js', df.sha);
+        toast('Saved to GitHub! 🎉');
+      } catch(err) {
+        toast('Save failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Save to GitHub';
+      }
+    }
+
+    // ─── Init ──────────────────────────────────────────────────────
+    function init() {
+      tabs   = typeof QG_TABS      !== 'undefined' ? JSON.parse(JSON.stringify(QG_TABS))      : [];
+      data   = typeof QG_DATA      !== 'undefined' ? JSON.parse(JSON.stringify(QG_DATA))      : {};
+      shorts = typeof QG_SHORTCUTS !== 'undefined' ? JSON.parse(JSON.stringify(QG_SHORTCUTS)) : {};
+
+      // Filter out shortcuts tab from the content tabs (it's separate)
+      const contentTabs = tabs.filter(t => t.id !== 'shortcuts');
+
+      // Build the tab list including shortcuts tab
+      activeTab = contentTabs[0]?.id || 'shortcuts';
+      buildTabs();
+      renderContent();
+    }
+
+    const _s = document.createElement('script');
+    _s.src = 'quick-guide-data.js?v=' + Date.now();
+    _s.onload = init;
+    _s.onerror = () => {
+      // File doesn't exist yet — start empty
+      tabs = [
+        { id:'powerapps', label:'Power Apps', icon:'bi-lightning-charge-fill', color:'#7b61ff' },
+        { id:'powerautomate', label:'Power Automate', icon:'bi-arrow-repeat', color:'#0078d4' },
+        { id:'powerbi', label:'Power BI / DAX', icon:'bi-bar-chart-fill', color:'#e6a800' },
+        { id:'sharepoint', label:'SharePoint', icon:'bi-diamond-fill', color:'#038387' },
+        { id:'excel', label:'Excel', icon:'bi-file-earmark-spreadsheet', color:'#217346' },
+        { id:'shortcuts', label:'Shortcuts', icon:'bi-keyboard', color:'#475569' }
+      ];
+      data = {}; shorts = {};
+      activeTab = 'powerapps';
+      buildTabs();
+      renderContent();
+    };
+    document.body.appendChild(_s);
+  </script>
+</body>
+</html>
