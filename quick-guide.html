@@ -123,9 +123,56 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto">
+              <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house"></i> Home</a></li>
-          <li class="nav-item"><a class="nav-link active" href="quick-guide.html"><i class="bi bi-lightning-charge"></i> Quick Guide</a></li>
+
+          <!-- Notes dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-journal-text"></i> Notes
+            </a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><a class="dropdown-item" href="new-note.html"><i class="bi bi-file-plus"></i> New Note</a></li>
+              <li><a class="dropdown-item" href="manage-notes.html"><i class="bi bi-pencil-square"></i> Manage Notes</a></li>
+            </ul>
+          </li>
+
+          <!-- Prompts dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-chat-square-text"></i> Prompts
+            </a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><a class="dropdown-item" href="new-prompt.html"><i class="bi bi-plus-square"></i> New Prompt</a></li>
+              <li><a class="dropdown-item" href="manage-prompts.html"><i class="bi bi-pencil-square"></i> Manage Prompts</a></li>
+            </ul>
+          </li>
+
+          <!-- Links dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-link-45deg"></i> Links
+            </a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><a class="dropdown-item" href="new-link.html"><i class="bi bi-plus-circle"></i> Add Link</a></li>
+              <li><a class="dropdown-item" href="manage-links.html"><i class="bi bi-pencil-square"></i> Manage Links</a></li>
+            </ul>
+          </li>
+
+          <!-- Settings / Manage dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle kb-nav-group" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-gear-fill"></i> Settings
+            </a>
+            <ul class="dropdown-menu kb-dropdown">
+              <li><h6 class="dropdown-header">Manage</h6></li>
+              <li><a class="dropdown-item" href="manage-categories.html"><i class="bi bi-grid-3x3-gap"></i> Categories</a></li>
+              <li><a class="dropdown-item" href="manage-subcategories.html"><i class="bi bi-tags"></i> Subcategories</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Reference</h6></li>
+              <li><a class="dropdown-item" href="quick-guide.html"><i class="bi bi-lightning-charge-fill"></i> Quick Guide</a></li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
