@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "emp-id",
+    title: "EMP ID",
+    category: "powerapps",
+    categoryLabel: "Power Apps",
+    subcategory: "Components",
+    excerpt: "EMP ID",
+    tags: ["general"],
+    file: "notes/powerapps/emp-id.html",
+    date: "2026-03-25"
+  },
+  {
     id: "modern-popup-with-embedded-gallery",
     title: "Modern Popup with Embedded Gallery",
     category: "powerapps",
