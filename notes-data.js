@@ -1,5 +1,16 @@
 const NOTES = [
   {
+    id: "claude-code",
+    title: "Claude Code",
+    category: "other",
+    categoryLabel: "Other",
+    subcategory: "Tips & Tricks",
+    excerpt: "Claude Hacks",
+    tags: ["general"],
+    file: "notes/other/claude-code.html",
+    date: "2026-04-26"
+  },
+  {
     id: "emp-id",
     title: "EMP ID",
     category: "powerapps",
